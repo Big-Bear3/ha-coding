@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "strict": true,
+        "importHelpers": true,
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "useDefineForClassFields": false,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "strictNullChecks": false,
+        "sourceMap": true,
+        "baseUrl": ".",
+        "lib": ["esnext", "dom"]
+    },
+    "include": ["src/**/*.ts", "src/**/*.mts", "index.mts", "index.d.ts"],
+    "exclude": ["node_modules"]
+}

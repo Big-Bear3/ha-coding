@@ -1,0 +1,12 @@
+{
+    "version": "1.0.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "ha-coding-debug",
+            "preLaunchTask": "build-for-debug",
+            "program": ".dist/index.mjs"
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+{
+    "name": "ha-coding",
+    "version": "1.0.0",
+    "main": "index.mjs",
+    "scripts": {
+        "build-for-debug": "tsc --outDir ./.dist",
+        "start": "tsc --outDir ./.dist && node .dist/index.mjs"
+    },
+    "author": "qm",
+    "license": "ISC",
+    "description": "ha-coding",
+    "dependencies": {
+        "lodash-es": "^4.17.21"
+    },
+    "devDependencies": {
+        "@types/lodash-es": "^4.17.12",
+        "@types/node": "^22.10.2",
+        "tslib": "^2.8.1",
+        "typescript": "^5.7.2"
+    }
+}
