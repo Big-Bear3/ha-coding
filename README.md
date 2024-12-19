@@ -1,2 +1,2 @@
 # ha-coding
-HA-oriented，using typescript to write automation
+HA-oriented, using typescript to write automation!
