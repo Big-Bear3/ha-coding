@@ -1,6 +1,6 @@
 import type { Class, MethodDescriptor, ObjectKey, ObjectType } from '../types/types';
 import { EffectManager } from './effect-manager.mjs';
-import { isEqual } from 'lodash-es';
+import { cloneDeep, isEqual } from 'lodash-es';
 
 interface StateInfo {
     name: ObjectKey;
@@ -41,6 +41,41 @@ export class StateManager {
 
                 effectManager.broadcast({ effect: { c, instance: this, state: key, stateType: 'state' }, value, oldValue });
             }
+        });
+    }
+
+    handleRef(refObj: Ref): void {
+        const effectManager = EffectManager.instance;
+
+        StateManager.instance.setStateValue(refObj, 'value', refObj.value);
+        StateManager.instance.setStateValue(refObj, 'valueCopy', cloneDeep(refObj.value));
+
+        Reflect.defineProperty(refObj, 'value', {
+            enumerable: true,
+            configurable: true,
+            get(): unknown {
+                effectManager.setEffects({ instance: refObj, state: 'value', stateType: 'ref' });
+                return StateManager.instance.getStateValue(refObj, 'value');
+            },
+            set(value: unknown) {
+                const oldValue = refObj.value;
+
+                if (isEqual(value, oldValue)) return;
+
+                StateManager.instance.setStateValue(refObj, 'value', value);
+                StateManager.instance.setStateValue(refObj, 'valueCopy', cloneDeep(value));
+
+                effectManager.broadcast({ effect: { instance: refObj, state: 'value', stateType: 'ref' }, value, oldValue });
+            }
+        });
+    }
+
+    triggerRef(refObj: Ref): void {
+        const oldValue = this.getStateValue(refObj, 'valueCopy');
+        EffectManager.instance.broadcast({
+            effect: { instance: refObj, state: 'value', stateType: 'ref' },
+            value: refObj.value,
+            oldValue
         });
     }
 

@@ -22,7 +22,7 @@ function onChange<T>(
         if (stateValues.length === 1) {
             cb(stateValues[0] as T, undefined);
         } else {
-            cb(stateValues as T, undefined);
+            cb(stateValues as T, [] as T);
         }
     }
 }

@@ -1,3 +1,8 @@
+declare interface Ref<T = any> {
+    value: T;
+    trigger: () => void;
+}
+
 declare const global: typeof globalThis & {
     onChange: <T>(
         statesGetter: () => T,
@@ -15,9 +20,12 @@ declare const global: typeof globalThis & {
     };
 
     delay: (cb: () => void, time: number) => () => void;
+
+    ref: <T>(value?: T) => Ref<T>;
 };
 
 declare const onChange = global.onChange;
 declare const onKeep = global.onKeep;
 declare const Timer = global.Timer;
 declare const delay = global.delay;
+declare const ref = global.ref;

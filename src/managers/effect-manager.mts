@@ -1,10 +1,10 @@
 import type { Class, ObjectKey, ObjectType } from '../types/types';
 
 export interface Effect {
-    c: Class;
+    c?: Class;
     instance: ObjectType;
     state: ObjectKey;
-    stateType: 'state' | 'event';
+    stateType: 'state' | 'ref' | 'event';
 }
 
 export interface EffectValue {
@@ -61,7 +61,9 @@ export class EffectManager {
                     const oldStateValues: unknown[] = [];
                     for (let j = 0; j < effects.length; j++) {
                         const targetStateValue =
-                            effects[j].stateType === 'state' ? effects[j].instance[effects[j].state] : undefined;
+                            effects[j].stateType === 'state' || effects[j].stateType === 'ref'
+                                ? effects[j].instance[effects[j].state]
+                                : undefined;
                         stateValues.push(targetStateValue);
 
                         if (j < i) oldStateValues.push(targetStateValue);
@@ -75,7 +77,9 @@ export class EffectManager {
                             oldStateValues.push(targetEffectValue.oldValue);
                         } else {
                             oldStateValues.push(
-                                effects[k].stateType === 'state' ? effects[k].instance[effects[k].state] : undefined
+                                effects[k].stateType === 'state' || effects[k].stateType === 'ref'
+                                    ? effects[k].instance[effects[k].state]
+                                    : undefined
                             );
                         }
                     }
