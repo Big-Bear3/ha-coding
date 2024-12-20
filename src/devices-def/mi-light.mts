@@ -14,9 +14,8 @@ export class MiLight {
     colorTemperature: number;
 
     @Event()
-    turnOn(time: number): void {
-        const t = this?.brightness;
-        console.log(this);
+    turnOn(time: number): number {
+        return time;
     }
 
     @Event()

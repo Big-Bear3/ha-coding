@@ -25,20 +25,34 @@ export class EffectManager {
 
     #effectsToObserver = new Map<Effect[], ObserverInfo>();
 
+    #observerIdToEffects = new Map<number, Effect[]>();
+
     #currentEffectValues = new Map<ObjectType, Map<ObjectKey, EffectValue>>();
 
     #currentTrackingEffects: Effect[] = [];
 
     #isTracking = false;
 
-    get newObserverId() {
+    get newObserverId(): number {
         return EffectManager.#observerId++;
     }
 
     private constructor() {}
 
-    addObserver(effects: Effect[], observer: ObserverInfo['observer']): void {
-        this.#effectsToObserver.set(effects, { id: this.newObserverId, observer });
+    addObserver(effects: Effect[], observer: ObserverInfo['observer'], observerId?: number): number {
+        if (observerId && this.#observerIdToEffects.has(observerId)) return observerId;
+
+        const targetObserverId = observerId ?? this.newObserverId;
+        this.#effectsToObserver.set(effects, { id: targetObserverId, observer });
+        this.#observerIdToEffects.set(targetObserverId, effects);
+
+        return targetObserverId;
+    }
+
+    removeObserver(observerId: number): void {
+        this.#observerIdToEffects.delete(observerId);
+        const targetEffects = this.#observerIdToEffects.get(observerId);
+        if (targetEffects) this.#effectsToObserver.delete(targetEffects);
     }
 
     broadcast(effectValue: EffectValue): void {
@@ -63,6 +77,8 @@ export class EffectManager {
                         const targetStateValue =
                             effects[j].stateType === 'state' || effects[j].stateType === 'ref'
                                 ? effects[j].instance[effects[j].state]
+                                : effects[j].stateType === 'event'
+                                ? this.#currentEffectValues.get(effects[i].instance)?.get(effects[i].state).value
                                 : undefined;
                         stateValues.push(targetStateValue);
 
@@ -103,7 +119,7 @@ export class EffectManager {
     }
 
     reap(): Effect[] {
-        return this.#currentTrackingEffects.splice(0);
+        return [...this.#currentTrackingEffects.splice(0)];
     }
 
     setEffects(effect: Effect): void {

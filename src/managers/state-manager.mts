@@ -5,7 +5,7 @@ import { cloneDeep, isEqual } from 'lodash-es';
 interface StateInfo {
     name: ObjectKey;
     type: 'state' | 'event';
-    originalEventFn?: (...args: unknown[]) => void;
+    originalEventFn?: (...args: unknown[]) => unknown;
 }
 
 export class StateManager {
@@ -101,9 +101,10 @@ export class StateManager {
                     effectManager.setEffects({ c, instance: this, state: stateInfo.name, stateType: 'event' });
 
                     return (...args: unknown[]) => {
-                        stateInfo.originalEventFn.bind(this)(...args);
+                        const res = stateInfo.originalEventFn.bind(this)(...args);
                         effectManager.broadcast({
-                            effect: { c, instance: this, state: stateInfo.name, stateType: 'event' }
+                            effect: { c, instance: this, state: stateInfo.name, stateType: 'event' },
+                            value: res
                         });
                     };
                 }

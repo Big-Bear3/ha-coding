@@ -2,7 +2,7 @@ import { EffectManager } from '../managers/effect-manager.mjs';
 
 function onChange<T>(
     statesGetter: () => T,
-    cb: (states: T, oldStates: T) => void,
+    cb: (states: any, oldStates: any) => void,
     onChangeOptions?: {
         immediate?: boolean;
     }
@@ -11,7 +11,7 @@ function onChange<T>(
     effectManager.track();
     statesGetter();
     const effects = effectManager.reap();
-    effectManager.addObserver(effects, cb);
+    const observerId = effectManager.addObserver(effects, cb);
 
     if (onChangeOptions?.immediate) {
         const stateValues: unknown[] = [];
@@ -20,11 +20,20 @@ function onChange<T>(
         }
 
         if (stateValues.length === 1) {
-            cb(stateValues[0] as T, undefined);
+            cb(stateValues[0], undefined);
         } else {
-            cb(stateValues as T, [] as T);
+            cb(stateValues, []);
         }
     }
+
+    return {
+        pause: () => {
+            effectManager.removeObserver(observerId);
+        },
+        resume: () => {
+            effectManager.addObserver(effects, cb, observerId);
+        }
+    };
 }
 
 global.onChange = onChange;
