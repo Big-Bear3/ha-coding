@@ -8,3 +8,5 @@ export function State() {
         StateManager.instance.handleState(c, key);
     } as PropertyDecorator;
 }
+
+global.State = State as any;

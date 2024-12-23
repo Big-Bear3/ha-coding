@@ -1,7 +1,3 @@
-import { State } from '../decorators/state.mjs';
-import { Device } from '../decorators/device.mjs';
-import { Event } from '../decorators/event.mjs';
-
 @Device()
 export class MiLight {
     @State()
@@ -13,11 +9,11 @@ export class MiLight {
     @State()
     colorTemperature: number;
 
-    @Event()
+    @Action()
     turnOn(time: number): number {
         return time;
     }
 
-    @Event()
+    @Action()
     turnOff(time: number, user: string): void {}
 }

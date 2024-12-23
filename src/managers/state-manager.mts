@@ -4,16 +4,16 @@ import { cloneDeep, isEqual } from 'lodash-es';
 
 interface StateInfo {
     name: ObjectKey;
-    type: 'state' | 'event';
-    originalEventFn?: (...args: unknown[]) => unknown;
+    type: 'state' | 'action';
+    originalActionFn?: (...args: unknown[]) => unknown;
 }
 
 export class StateManager {
     static #instance: StateManager;
 
-    #classToStates = new Map<Class, Set<StateInfo>>();
+    readonly #classToStates = new Map<Class, Set<StateInfo>>();
 
-    #instanceToStateValues = new WeakMap<ObjectType, Record<ObjectKey, unknown>>();
+    readonly #instanceToStateValues = new WeakMap<ObjectType, Record<ObjectKey, unknown>>();
 
     private constructor() {}
 
@@ -79,15 +79,15 @@ export class StateManager {
         });
     }
 
-    handleEventState(c: Class, key: ObjectKey, eventFnDescriptor: MethodDescriptor): void {
+    handleActionState(c: Class, key: ObjectKey, actionFnDescriptor: MethodDescriptor): void {
         this.setClassState(c, {
             name: key,
-            type: 'event',
-            originalEventFn: eventFnDescriptor.value as StateInfo['originalEventFn']
+            type: 'action',
+            originalActionFn: actionFnDescriptor.value as StateInfo['originalActionFn']
         });
     }
 
-    handleEventDefine(c: Class): void {
+    handleActionDefine(c: Class): void {
         const effectManager = EffectManager.instance;
         const stateInfos = this.#classToStates.get(c);
 
@@ -98,12 +98,12 @@ export class StateManager {
                 enumerable: false,
                 configurable: true,
                 get(): unknown {
-                    effectManager.setEffects({ c, instance: this, state: stateInfo.name, stateType: 'event' });
+                    effectManager.setEffects({ c, instance: this, state: stateInfo.name, stateType: 'action' });
 
                     return (...args: unknown[]) => {
-                        const res = stateInfo.originalEventFn.bind(this)(...args);
+                        const res = stateInfo.originalActionFn.bind(this)(...args);
                         effectManager.broadcast({
-                            effect: { c, instance: this, state: stateInfo.name, stateType: 'event' },
+                            effect: { c, instance: this, state: stateInfo.name, stateType: 'action' },
                             value: res
                         });
                     };
@@ -133,6 +133,16 @@ export class StateManager {
 
     getStateValue(instance: ObjectType, key: ObjectKey): unknown {
         return StateManager.instance.#instanceToStateValues.get(instance)?.[key];
+    }
+
+    hasState(c: Class, key: ObjectKey, stateType?: StateInfo['type']): boolean {
+        const stateInfos = this.#classToStates.get(c);
+        if (!stateInfos) return false;
+
+        for (const stateInfo of stateInfos) {
+            if (stateInfo.name === key) return stateType ? stateInfo.type === stateType : true;
+        }
+        return false;
     }
 
     static get instance(): StateManager {

@@ -1,8 +1,3 @@
-declare interface Ref<T = any> {
-    value: T;
-    trigger: () => void;
-}
-
 type ArrayIndexes<T extends any[], U extends any[] = []> =
     | U['length']
     | ([...U, any]['length'] extends T['length'] ? never : ArrayIndexes<T, [...U, any]>);
@@ -15,7 +10,18 @@ type MapToValueOrReturnValue<T extends readonly any[], U extends any[] = []> = T
 
 type CbStates<T> = T extends readonly any[] ? MapToValueOrReturnValue<T> : ValueOrReturnValue<T>;
 
+declare interface Ref<T = any> {
+    value: T;
+    trigger: () => void;
+}
+
 declare const global: typeof globalThis & {
+    Device: () => ClassDecorator;
+
+    State: () => PropertyDecorator;
+
+    Action: () => MethodDecorator;
+
     onChange: <T>(
         statesGetter: () => T,
         cb: (states: CbStates<readonly T>, oldStates: CbStates<readonly T>) => void,
@@ -56,6 +62,9 @@ declare const global: typeof globalThis & {
     ref: <T>(value?: T) => Ref<T>;
 };
 
+declare const Device = global.Device;
+declare const State = global.State;
+declare const Action = global.Action;
 declare const onChange = global.onChange;
 declare const onKeep = global.onKeep;
 declare const stage = global.stage;

@@ -4,7 +4,7 @@ export interface Effect {
     c?: Class;
     instance: ObjectType;
     state: ObjectKey;
-    stateType: 'state' | 'ref' | 'event';
+    stateType: 'state' | 'ref' | 'action';
 }
 
 export interface EffectValue {
@@ -15,7 +15,7 @@ export interface EffectValue {
 
 export interface ObserverInfo {
     id: number;
-    observer: (states: any, oldStates: any) => void;
+    observer: () => void;
 }
 
 export class EffectManager {
@@ -23,11 +23,11 @@ export class EffectManager {
 
     static #observerId = 1;
 
-    #effectsToObserver = new Map<Effect[], ObserverInfo>();
+    readonly #effectsToObserver = new Map<Effect[], ObserverInfo>();
 
-    #observerIdToEffects = new Map<number, Effect[]>();
+    readonly #observerIdToEffects = new Map<number, Effect[]>();
 
-    #currentEffectValues = new Map<ObjectType, Map<ObjectKey, EffectValue>>();
+    readonly #currentEffectValues = new Map<ObjectType, Map<ObjectKey, EffectValue>>();
 
     #currentTrackingEffects: Effect[] = [];
 
@@ -58,10 +58,10 @@ export class EffectManager {
     broadcast(effectValue: EffectValue): void {
         const oldSize = this.#currentEffectValues.size;
 
-        let targetInstance = this.#currentEffectValues.get(effectValue.effect.instance);
-        if (!targetInstance) targetInstance = new Map();
-        this.#currentEffectValues.set(effectValue.effect.instance, targetInstance);
-        targetInstance.set(effectValue.effect.state, effectValue);
+        let targetInstanceToEffectValue = this.#currentEffectValues.get(effectValue.effect.instance);
+        if (!targetInstanceToEffectValue) targetInstanceToEffectValue = new Map();
+        this.#currentEffectValues.set(effectValue.effect.instance, targetInstanceToEffectValue);
+        targetInstanceToEffectValue.set(effectValue.effect.state, effectValue);
 
         if (oldSize > 0) return;
 
@@ -71,60 +71,34 @@ export class EffectManager {
                     const targetEffectValue = this.#currentEffectValues.get(effects[i].instance)?.get(effects[i].state);
                     if (!targetEffectValue || !this.isEqualEffect(effects[i], targetEffectValue.effect)) continue;
 
-                    const stateValues: unknown[] = [];
-                    const oldStateValues: unknown[] = [];
-                    for (let j = 0; j < effects.length; j++) {
-                        const targetStateValue =
-                            effects[j].stateType === 'state' || effects[j].stateType === 'ref'
-                                ? effects[j].instance[effects[j].state]
-                                : effects[j].stateType === 'event'
-                                ? this.#currentEffectValues.get(effects[i].instance)?.get(effects[i].state).value
-                                : undefined;
-                        stateValues.push(targetStateValue);
-
-                        if (j < i) oldStateValues.push(targetStateValue);
-                    }
-
-                    oldStateValues[i] = targetEffectValue.oldValue;
-
-                    for (let k = i + 1; k < effects.length; k++) {
-                        const targetEffectValue = this.#currentEffectValues.get(effects[k].instance)?.get(effects[k].state);
-                        if (targetEffectValue) {
-                            oldStateValues.push(targetEffectValue.oldValue);
-                        } else {
-                            oldStateValues.push(
-                                effects[k].stateType === 'state' || effects[k].stateType === 'ref'
-                                    ? effects[k].instance[effects[k].state]
-                                    : undefined
-                            );
-                        }
-                    }
-
-                    if (stateValues.length === 1) {
-                        observerInfo.observer(stateValues[0], oldStateValues[0]);
-                    } else {
-                        observerInfo.observer(stateValues, oldStateValues);
-                    }
+                    observerInfo.observer();
 
                     break;
                 }
             }
-
             this.#currentEffectValues.clear();
         });
     }
 
     track(): void {
+        this.#currentTrackingEffects = [];
         this.#isTracking = true;
     }
 
     reap(): Effect[] {
-        return [...this.#currentTrackingEffects.splice(0)];
+        this.#isTracking = false;
+        const effects = this.#currentTrackingEffects;
+        this.#currentTrackingEffects = [];
+        return effects;
     }
 
     setEffects(effect: Effect): void {
         if (!this.#isTracking) return;
         this.#currentTrackingEffects.push(effect);
+    }
+
+    getCurrentEffectValue(instance: ObjectType, state: ObjectKey): EffectValue {
+        return this.#currentEffectValues.get(instance)?.get(state);
     }
 
     private isEqualEffect(effect1: Effect, effect2: Effect): boolean {
