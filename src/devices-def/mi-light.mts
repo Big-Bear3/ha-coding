@@ -15,5 +15,11 @@ export class MiLight {
     }
 
     @Action()
-    turnOff(time: number, user: string): void {}
+    turnOff(userName: string, userId: number): string {
+        return userName + '-' + JSON.stringify(userId);
+    }
+
+    toggle(time: number): number {
+        return time;
+    }
 }

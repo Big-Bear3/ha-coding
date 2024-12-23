@@ -1,5 +1,6 @@
 import { cloneDeep } from 'lodash-es';
-import { Effect, EffectManager } from '../managers/effect-manager.mjs';
+import { EffectManager } from '../managers/effect-manager.mjs';
+import { StateManager } from '../managers/state-manager.mjs';
 
 function onChange<T>(
     statesGetter: () => T,
@@ -9,40 +10,48 @@ function onChange<T>(
     }
 ) {
     const effectManager = EffectManager.instance;
+    const stateManager = StateManager.instance;
     effectManager.track();
-    const originalStatesValue = statesGetter();
+    const originalStatesGetterRes = statesGetter();
     const effects = effectManager.reap();
 
-    let oldStatesValue = cloneDeep(originalStatesValue);
+    let oldStatesGetterRes = cloneDeep(originalStatesGetterRes);
 
-    if (Array.isArray(oldStatesValue)) {
-        replaceActionOfStatesValue(oldStatesValue, true);
+    if (Array.isArray(oldStatesGetterRes)) {
+        replaceActionOfStatesGetterRes(oldStatesGetterRes, true);
     } else {
-        const effect = getValidActionStateEffect(statesGetter);
-        if (effect) oldStatesValue = undefined;
+        if (typeof oldStatesGetterRes === 'function') {
+            const actionInfo = stateManager.getActionInfoByActionFn(oldStatesGetterRes as Function);
+            if (actionInfo) oldStatesGetterRes = undefined;
+        }
     }
 
     const handledCb = () => {
-        const statesValue = statesGetter();
+        const statesGetterRes = statesGetter();
 
-        if (Array.isArray(statesValue)) {
-            const actionStateIndexes = replaceActionOfStatesValue(statesValue);
+        if (Array.isArray(statesGetterRes)) {
+            const actionStateIndexes = replaceActionOfStatesGetterRes(statesGetterRes);
 
-            cb(statesValue, oldStatesValue);
+            cb(statesGetterRes, oldStatesGetterRes);
 
-            oldStatesValue = cloneDeep(statesValue);
+            oldStatesGetterRes = cloneDeep(statesGetterRes);
             for (const actionStateIndex of actionStateIndexes) {
-                (oldStatesValue as any[])[actionStateIndex] = undefined;
+                (oldStatesGetterRes as any[])[actionStateIndex] = undefined;
             }
         } else {
-            const effect = getValidActionStateEffect(statesGetter);
-            if (effect) {
-                const effectValue = effectManager.getCurrentEffectValue(effect.instance, effect.state);
-                cb(effectValue.value, undefined);
-                oldStatesValue = undefined;
+            if (typeof oldStatesGetterRes === 'function') {
+                const actionInfo = stateManager.getActionInfoByActionFn(oldStatesGetterRes as Function);
+                if (actionInfo) {
+                    const effectValue = effectManager.getCurrentEffectValue(actionInfo.instance, actionInfo.name);
+                    cb(effectValue.value, undefined);
+                    oldStatesGetterRes = undefined;
+                } else {
+                    cb(statesGetterRes, oldStatesGetterRes);
+                    oldStatesGetterRes = statesGetterRes;
+                }
             } else {
-                cb(statesValue, oldStatesValue);
-                oldStatesValue = cloneDeep(statesValue);
+                cb(statesGetterRes, oldStatesGetterRes);
+                oldStatesGetterRes = cloneDeep(statesGetterRes);
             }
         }
     };
@@ -50,10 +59,10 @@ function onChange<T>(
     const observerId = effectManager.addObserver(effects, handledCb);
 
     if (onChangeOptions?.immediate) {
-        if (Array.isArray(oldStatesValue)) {
-            cb(oldStatesValue, []);
+        if (Array.isArray(oldStatesGetterRes)) {
+            cb(oldStatesGetterRes, []);
         } else {
-            cb(oldStatesValue, undefined);
+            cb(oldStatesGetterRes, undefined);
         }
     }
 
@@ -67,22 +76,23 @@ function onChange<T>(
     };
 }
 
-function replaceActionOfStatesValue(statesValue: unknown, replaceToUndefined: boolean = false): number[] {
+function replaceActionOfStatesGetterRes(statesGetterRes: unknown, replaceToUndefined: boolean = false): number[] {
     const effectManager = EffectManager.instance;
+    const stateManager = StateManager.instance;
     const actionStateIndexes: number[] = [];
-    if (Array.isArray(statesValue)) {
-        for (let i = 0; i < statesValue.length; i++) {
-            const statesValueItem = statesValue[i];
-            if (typeof statesValueItem !== 'function') continue;
+    if (Array.isArray(statesGetterRes)) {
+        for (let i = 0; i < statesGetterRes.length; i++) {
+            const statesGetterResItem = statesGetterRes[i];
+            if (typeof statesGetterResItem !== 'function') continue;
 
-            const effect = getValidActionStateEffect(() => statesValue[i]);
+            const actionInfo = stateManager.getActionInfoByActionFn(statesGetterRes[i] as Function);
 
-            if (effect) {
+            if (actionInfo) {
                 if (replaceToUndefined) {
-                    statesValue[i] = undefined;
+                    statesGetterRes[i] = undefined;
                 } else {
-                    const effectValues = effectManager.getCurrentEffectValue(effect.instance, effect.state);
-                    statesValue[i] = effectValues.value;
+                    const effectValues = effectManager.getCurrentEffectValue(actionInfo.instance, actionInfo.name);
+                    statesGetterRes[i] = effectValues?.value;
                 }
 
                 actionStateIndexes.push(i);
@@ -91,18 +101,6 @@ function replaceActionOfStatesValue(statesValue: unknown, replaceToUndefined: bo
     }
 
     return actionStateIndexes;
-}
-
-function getValidActionStateEffect(stateGetter: () => unknown): Effect {
-    const effectManager = EffectManager.instance;
-
-    effectManager.track();
-    const statesValue = stateGetter();
-    const effects = effectManager.reap();
-
-    if (typeof statesValue !== 'function' || effects.length !== 1) return undefined;
-
-    return effects[0];
 }
 
 global.onChange = onChange;

@@ -4,7 +4,8 @@
     "main": "index.mjs",
     "scripts": {
         "build-for-debug": "tsc --outDir ./.dist",
-        "start": "tsc --outDir ./.dist && node .dist/index.mjs"
+        "start": "tsc --outDir ./.dist && node .dist/index.mjs",
+        "test": "tsc --outDir ./.dist && cd ./.dist/tests && node index.mjs"
     },
     "author": "qm",
     "license": "ISC",

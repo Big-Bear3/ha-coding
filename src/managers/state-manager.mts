@@ -8,12 +8,19 @@ interface StateInfo {
     originalActionFn?: (...args: unknown[]) => unknown;
 }
 
+interface ActionInfo {
+    name: ObjectKey;
+    instance: ObjectType;
+}
+
 export class StateManager {
     static #instance: StateManager;
 
     readonly #classToStates = new Map<Class, Set<StateInfo>>();
 
     readonly #instanceToStateValues = new WeakMap<ObjectType, Record<ObjectKey, unknown>>();
+
+    readonly #actionFnToActionInfo = new WeakMap<Function, ActionInfo>();
 
     private constructor() {}
 
@@ -100,13 +107,20 @@ export class StateManager {
                 get(): unknown {
                     effectManager.setEffects({ c, instance: this, state: stateInfo.name, stateType: 'action' });
 
-                    return (...args: unknown[]) => {
+                    const actionFn = (...args: unknown[]) => {
                         const res = stateInfo.originalActionFn.bind(this)(...args);
                         effectManager.broadcast({
                             effect: { c, instance: this, state: stateInfo.name, stateType: 'action' },
                             value: res
                         });
                     };
+
+                    StateManager.instance.#actionFnToActionInfo.set(actionFn, {
+                        name: stateInfo.name,
+                        instance: this
+                    });
+
+                    return actionFn;
                 }
             });
         }
@@ -143,6 +157,10 @@ export class StateManager {
             if (stateInfo.name === key) return stateType ? stateInfo.type === stateType : true;
         }
         return false;
+    }
+
+    getActionInfoByActionFn(actionFn: Function): ActionInfo {
+        return this.#actionFnToActionInfo.get(actionFn);
     }
 
     static get instance(): StateManager {
