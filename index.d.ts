@@ -33,7 +33,14 @@ declare const global: typeof globalThis & {
         resume: () => void;
     };
 
-    onKeep: (statesJudger: () => boolean, cb: () => void, keepTime: number) => void;
+    onKeep: (
+        statesJudger: () => boolean,
+        cb: () => void,
+        keepTime: number
+    ) => {
+        pause: () => void;
+        resume: () => void;
+    };
 
     stage: <T extends [Parameters<typeof onChange>, Parameters<typeof onChange>, ...Parameters<typeof onChange>[]]>(
         ...steps: T
@@ -42,6 +49,8 @@ declare const global: typeof globalThis & {
         prev: () => void;
         goto: (stepIndex: ArrayIndexes<T>) => void;
         reset: () => void;
+        pause: () => void;
+        resume: () => void;
     };
 
     step: <T>(
@@ -60,6 +69,9 @@ declare const global: typeof globalThis & {
     delay: (cb: () => void, time: number) => () => void;
 
     ref: <T>(value?: T) => Ref<T>;
+
+    cloneDeep: <T>(value: T) => T;
+    isEqual: (value: any, other: any) => boolean;
 };
 
 declare const Device = global.Device;
@@ -72,3 +84,5 @@ declare const step = global.step;
 declare const Timer = global.Timer;
 declare const delay = global.delay;
 declare const ref = global.ref;
+declare const cloneDeep = global.cloneDeep;
+declare const isEqual = global.isEqual;

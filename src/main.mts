@@ -2,6 +2,7 @@ import './decorators/index.mjs';
 import './actions/index.mjs';
 import './devices-def/index.mjs';
 import './objects/index.mjs';
+import './utils/app-utils.mjs';
 
 import { MiLight } from './devices-def/mi-light.mjs';
 

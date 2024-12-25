@@ -2,6 +2,7 @@
     "name": "ha-coding",
     "version": "1.0.0",
     "main": "index.mjs",
+    "type": "module",
     "scripts": {
         "build-for-debug": "tsc --outDir ./.dist",
         "start": "tsc --outDir ./.dist && node .dist/index.mjs",

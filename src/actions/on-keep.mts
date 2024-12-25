@@ -8,7 +8,7 @@ function onKeep(statesJudger: () => boolean, cb: () => void, keepTime: number) {
 
     let timeout: NodeJS.Timeout;
 
-    effectManager.addObserver(effects, () => {
+    const handledCb = () => {
         const res = statesJudger();
         if (res) {
             if (timeout) return;
@@ -20,7 +20,18 @@ function onKeep(statesJudger: () => boolean, cb: () => void, keepTime: number) {
             clearTimeout(timeout);
             timeout = null;
         }
-    });
+    };
+
+    const observerId = effectManager.addObserver(effects, handledCb);
+
+    return {
+        pause: () => {
+            effectManager.removeObserver(observerId);
+        },
+        resume: () => {
+            effectManager.addObserver(effects, handledCb, observerId);
+        }
+    };
 }
 
 global.onKeep = onKeep;

@@ -38,9 +38,13 @@ function stage(...steps: Parameters<typeof onChange>[]) {
 
     const reset = () => goto(0);
 
+    const pause = () => onChangeOperations[currentStepIndex].pause();
+
+    const resume = () => onChangeOperations[currentStepIndex].resume();
+
     reset();
 
-    return { next, prev, goto, reset };
+    return { next, prev, goto, reset, pause, resume };
 }
 
 function step<T>(
