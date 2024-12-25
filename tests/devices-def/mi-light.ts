@@ -11,7 +11,7 @@ export class MiLight {
     brightness: string;
 
     @State()
-    colorTemperature: number;
+    colorTemperature = 4000;
 
     @Action()
     turnOn(time: number): number {

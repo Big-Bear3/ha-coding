@@ -6,7 +6,7 @@
             "request": "launch",
             "name": "ha-coding-debug",
             "preLaunchTask": "build-for-debug",
-            "program": ".dist/index.mjs"
+            "program": ".dist/index.js"
         }
     ]
 }

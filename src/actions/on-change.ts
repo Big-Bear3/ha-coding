@@ -11,11 +11,13 @@ export function onChange<T>(
 ) {
     const effectManager = EffectManager.instance;
     const stateManager = StateManager.instance;
+
     effectManager.track();
     const originalStatesGetterRes = statesGetter();
     const effects = effectManager.reap();
 
-    let oldStatesGetterRes = cloneDeep(originalStatesGetterRes);
+    let oldStatesGetterRes =
+        typeof originalStatesGetterRes === 'function' ? originalStatesGetterRes : cloneDeep(originalStatesGetterRes);
 
     if (Array.isArray(oldStatesGetterRes)) {
         replaceActionOfStatesGetterRes(oldStatesGetterRes, true);
@@ -39,8 +41,8 @@ export function onChange<T>(
                 (oldStatesGetterRes as any[])[actionStateIndex] = undefined;
             }
         } else {
-            if (typeof oldStatesGetterRes === 'function') {
-                const actionInfo = stateManager.getActionInfoByActionFn(oldStatesGetterRes as Function);
+            if (typeof statesGetterRes === 'function') {
+                const actionInfo = stateManager.getActionInfoByActionFn(statesGetterRes as Function);
                 if (actionInfo) {
                     const effectValue = effectManager.getCurrentEffectValue(actionInfo.instance, actionInfo.name);
                     cb(effectValue.value, undefined);

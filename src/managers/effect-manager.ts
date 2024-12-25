@@ -50,9 +50,9 @@ export class EffectManager {
     }
 
     removeObserver(observerId: number): void {
-        this.#observerIdToEffects.delete(observerId);
         const targetEffects = this.#observerIdToEffects.get(observerId);
         if (targetEffects) this.#effectsToObserver.delete(targetEffects);
+        this.#observerIdToEffects.delete(observerId);
     }
 
     broadcast(effectValue: EffectValue): void {
