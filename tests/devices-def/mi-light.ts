@@ -1,6 +1,7 @@
 import { Action } from '../../src/decorators/action.js';
 import { Device } from '../../src/decorators/device.js';
 import { State } from '../../src/decorators/state.js';
+import { ref } from '../../src/objects/ref.js';
 
 @Device()
 export class MiLight {
@@ -12,6 +13,15 @@ export class MiLight {
 
     @State()
     colorTemperature = 4000;
+
+    @State()
+    gradient = {
+        on: 1000,
+        off: 1500
+    };
+
+    @State()
+    color = ref('red');
 
     @Action()
     turnOn(time: number): number {

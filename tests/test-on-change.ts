@@ -368,3 +368,94 @@ describe('暂停&恢复', () => {
         assert.strictEqual(flag, 2);
     }, 10);
 });
+
+describe('对象类型', () => {
+    const light = new MiLight();
+    let flag = 0;
+
+    setTimeout(() => {
+        onChange(
+            () => [light.status, light.gradient] as const,
+            ([status, gradient]) => {
+                assert.deepStrictEqual(gradient, { on: 500, off: 600 });
+                flag++;
+            }
+        );
+
+        light.gradient = { on: 500, off: 600 };
+
+        setTimeout(() => {
+            light.gradient.on = 400;
+        }, 1);
+
+        setTimeout(() => {
+            assert.strictEqual(flag, 1);
+        }, 10);
+    }, 1);
+});
+
+describe('自由组合', () => {
+    const light = new MiLight();
+    let flag = 0;
+
+    setTimeout(() => {
+        onChange(
+            () => ({ status: light.status, brightness: light.brightness, turnOn: light.turnOn } as const),
+            ({ status, brightness, turnOn }) => {
+                assert.strictEqual(status, 10);
+                assert.strictEqual(brightness, '50%');
+                assert.strictEqual(typeof turnOn, 'function');
+                flag++;
+            }
+        );
+
+        light.status = 10;
+        light.brightness = '50%';
+
+        setTimeout(() => {
+            light.turnOn(-1);
+        }, 1);
+
+        setTimeout(() => {
+            assert.strictEqual(flag, 2);
+        }, 10);
+    }, 1);
+});
+
+describe('@State装饰ref变量', () => {
+    const light = new MiLight();
+    let flag = 0;
+
+    setTimeout(() => {
+        onChange(
+            () => light.color.value,
+            (color) => {
+                if (flag === 0) {
+                    assert.strictEqual(color, 'red');
+                    flag++;
+                } else if (flag === 1) {
+                    assert.strictEqual(color, 'yellow');
+                    flag++;
+                } else if (flag === 2) {
+                    assert.strictEqual(color, 'green');
+                    flag++;
+                }
+            },
+            { immediate: true }
+        );
+
+        light.color.value = 'yellow';
+
+        setTimeout(() => {
+            light.color = ref('green');
+        }, 1);
+
+        setTimeout(() => {
+            light.color.value = 'blue';
+        }, 2);
+
+        setTimeout(() => {
+            assert.strictEqual(flag, 3);
+        }, 10);
+    }, 1);
+});
