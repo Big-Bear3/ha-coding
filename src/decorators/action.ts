@@ -1,6 +1,6 @@
-import { isStaticMember } from '../utils/object-utils.mjs';
+import { isStaticMember } from '../utils/object-utils.js';
 import type { Class, MethodDescriptor } from '../types/types';
-import { StateManager } from '../managers/state-manager.mjs';
+import { StateManager } from '../managers/state-manager.js';
 
 export function Action() {
     return function (c: Class, key: string, methodDescriptor: MethodDescriptor) {
@@ -8,5 +8,3 @@ export function Action() {
         StateManager.instance.handleActionState(c, key, methodDescriptor);
     } as MethodDecorator;
 }
-
-global.Action = Action as any;

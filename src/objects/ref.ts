@@ -1,6 +1,11 @@
-import { StateManager } from '../managers/state-manager.mjs';
+import { StateManager } from '../managers/state-manager.js';
 
-function ref<T>(value?: T): Ref<T> {
+export interface Ref<T = any> {
+    value: T;
+    trigger: () => void;
+}
+
+export function ref<T>(value?: T): Ref<T> {
     const refObj: Ref = {
         value,
         trigger: () => {
@@ -11,5 +16,3 @@ function ref<T>(value?: T): Ref<T> {
     StateManager.instance.handleRef(refObj);
     return refObj;
 }
-
-global.ref = ref;

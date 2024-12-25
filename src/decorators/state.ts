@@ -1,5 +1,5 @@
-import { isStaticMember } from '../utils/object-utils.mjs';
-import { StateManager } from '../managers/state-manager.mjs';
+import { isStaticMember } from '../utils/object-utils.js';
+import { StateManager } from '../managers/state-manager.js';
 import type { Class, ObjectKey } from '../types/types';
 
 export function State() {
@@ -8,5 +8,3 @@ export function State() {
         StateManager.instance.handleState(c, key);
     } as PropertyDecorator;
 }
-
-global.State = State as any;

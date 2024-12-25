@@ -1,4 +1,6 @@
-function stage(...steps: Parameters<typeof onChange>[]) {
+import { onChange } from './on-change.js';
+
+export function stage(...steps: Parameters<typeof onChange>[]) {
     let currentStepIndex: number;
     const onChangeOperations: ReturnType<typeof onChange>[] = [];
     let waitingTimeout: NodeJS.Timeout;
@@ -47,7 +49,7 @@ function stage(...steps: Parameters<typeof onChange>[]) {
     return { next, prev, goto, reset, pause, resume };
 }
 
-function step<T>(
+export function step<T>(
     statesGetter: () => T,
     cb: (states: any, oldStates: any) => void,
     onChangeOptions?: {
@@ -56,6 +58,3 @@ function step<T>(
 ) {
     return onChangeOptions ? [statesGetter, cb, onChangeOptions] : [statesGetter, cb];
 }
-
-global.stage = stage;
-global.step = step;

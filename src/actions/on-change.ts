@@ -1,8 +1,8 @@
 import { cloneDeep } from 'lodash-es';
-import { EffectManager } from '../managers/effect-manager.mjs';
-import { StateManager } from '../managers/state-manager.mjs';
+import { EffectManager } from '../managers/effect-manager.js';
+import { StateManager } from '../managers/state-manager.js';
 
-function onChange<T>(
+export function onChange<T>(
     statesGetter: () => T,
     cb: (states: any, oldStates: any) => void,
     onChangeOptions?: {
@@ -102,5 +102,3 @@ function replaceActionOfStatesGetterRes(statesGetterRes: unknown, replaceToUndef
 
     return actionStateIndexes;
 }
-
-global.onChange = onChange;

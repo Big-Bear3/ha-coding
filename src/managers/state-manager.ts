@@ -1,5 +1,6 @@
+import type { Ref } from '../objects/ref';
 import type { Class, MethodDescriptor, ObjectKey, ObjectType } from '../types/types';
-import { EffectManager } from './effect-manager.mjs';
+import { EffectManager } from './effect-manager.js';
 import { cloneDeep, isEqual } from 'lodash-es';
 
 interface StateInfo {

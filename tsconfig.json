@@ -13,8 +13,8 @@
         "strictNullChecks": false,
         "sourceMap": true,
         "baseUrl": ".",
-        "lib": ["esnext", "dom"]
+        "lib": ["esnext"]
     },
-    "include": ["src/**/*.ts", "src/**/*.mts", "tests/**/*.ts", "tests/**/*.mts", "index.mts", "index.d.ts"],
+    "include": ["src/**/*.ts", "tests/**/*.ts", "index.d.ts"],
     "exclude": ["node_modules"]
 }

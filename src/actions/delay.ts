@@ -1,4 +1,4 @@
-function delay(cb: () => void, time: number): () => void {
+export function delay(cb: () => void, time: number): () => void {
     let timeout = setTimeout(() => {
         cb();
         timeout = null;
@@ -11,5 +11,3 @@ function delay(cb: () => void, time: number): () => void {
         }
     };
 }
-
-global.delay = delay;

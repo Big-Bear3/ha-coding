@@ -1,6 +1,7 @@
 import { describe } from 'node:test';
-import { MiLight } from '../src/devices-def/mi-light.mjs';
+import { MiLight } from './devices-def/mi-light.js';
 import assert from 'assert';
+import { onChange } from '../index.js';
 
 describe('事件', () => {
     const light = new MiLight();

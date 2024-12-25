@@ -1,12 +1,12 @@
 {
     "name": "ha-coding",
     "version": "1.0.0",
-    "main": "index.mjs",
+    "main": "index.js",
     "type": "module",
     "scripts": {
-        "build-for-debug": "tsc --outDir ./.dist",
-        "start": "tsc --outDir ./.dist && node .dist/index.mjs",
-        "test": "tsc --outDir ./.dist && cd ./.dist/tests && node index.mjs"
+        "build-for-debug": "tsc --outDir .dist",
+        "start": "tsc --outDir .dist && copy index.js .dist && node .dist/index.js",
+        "test": "tsc --outDir .dist && copy index.js .dist && cd .dist/tests && node index.js"
     },
     "author": "qm",
     "license": "ISC",

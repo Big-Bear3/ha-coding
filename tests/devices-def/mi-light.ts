@@ -1,3 +1,7 @@
+import { Action } from '../../src/decorators/action.js';
+import { Device } from '../../src/decorators/device.js';
+import { State } from '../../src/decorators/state.js';
+
 @Device()
 export class MiLight {
     @State()

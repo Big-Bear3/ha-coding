@@ -19,5 +19,3 @@ export class Timer {
         this.#timeout = null;
     }
 }
-
-global.Timer = Timer;

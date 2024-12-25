@@ -1,6 +1,6 @@
-import { EffectManager } from '../managers/effect-manager.mjs';
+import { EffectManager } from '../managers/effect-manager.js';
 
-function onKeep(statesJudger: () => boolean, cb: () => void, keepTime: number) {
+export function onKeep(statesJudger: () => boolean, cb: () => void, keepTime: number) {
     const effectManager = EffectManager.instance;
     effectManager.track();
     statesJudger();
@@ -33,5 +33,3 @@ function onKeep(statesJudger: () => boolean, cb: () => void, keepTime: number) {
         }
     };
 }
-
-global.onKeep = onKeep;
