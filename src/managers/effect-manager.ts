@@ -66,16 +66,20 @@ export class EffectManager {
         if (oldSize > 0) return;
 
         process.nextTick(() => {
+            const targetObserverInfos: ObserverInfo[] = [];
             for (const [effects, observerInfo] of this.#effectsToObserver) {
                 for (let i = 0; i < effects.length; i++) {
                     const targetEffectValue = this.#currentEffectValues.get(effects[i].instance)?.get(effects[i].state);
                     if (!targetEffectValue || !this.isEqualEffect(effects[i], targetEffectValue.effect)) continue;
-
-                    observerInfo.observer();
-
+                    targetObserverInfos.push(observerInfo);
                     break;
                 }
             }
+
+            for (const targetObserverInfo of targetObserverInfos) {
+                targetObserverInfo.observer();
+            }
+
             this.#currentEffectValues.clear();
         });
     }
@@ -94,7 +98,9 @@ export class EffectManager {
 
     setEffects(effect: Effect): void {
         if (!this.#isTracking) return;
-        this.#currentTrackingEffects.push(effect);
+        if (this.#currentTrackingEffects.every((currentTrackingEffect) => !this.isEqualEffect(currentTrackingEffect, effect))) {
+            this.#currentTrackingEffects.push(effect);
+        }
     }
 
     getCurrentEffectValue(instance: ObjectType, state: ObjectKey): EffectValue {

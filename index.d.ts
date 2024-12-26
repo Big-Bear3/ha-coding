@@ -37,7 +37,7 @@ export function onKeep(
     cb: () => void,
     keepTime: number
 ): {
-    pause: () => void;
+    stop: () => void;
     resume: () => void;
 };
 

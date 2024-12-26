@@ -1,15 +1,17 @@
-import { EffectManager } from '../managers/effect-manager.js';
+import { Effect, EffectManager } from '../managers/effect-manager.js';
 
 export function onKeep(statesJudger: () => boolean, cb: () => void, keepTime: number) {
     const effectManager = EffectManager.instance;
-    effectManager.track();
-    statesJudger();
-    const effects = effectManager.reap();
 
     let timeout: NodeJS.Timeout;
+    let currentEffects: Effect[];
+    let observerId: number;
 
     const handledCb = () => {
+        effectManager.track();
         const res = statesJudger();
+        currentEffects = effectManager.reap();
+
         if (res) {
             if (timeout) return;
             timeout = setTimeout(() => {
@@ -20,16 +22,25 @@ export function onKeep(statesJudger: () => boolean, cb: () => void, keepTime: nu
             clearTimeout(timeout);
             timeout = null;
         }
+
+        if (observerId) {
+            effectManager.removeObserver(observerId);
+            effectManager.addObserver(currentEffects, handledCb, observerId);
+        } else {
+            observerId = effectManager.addObserver(currentEffects, handledCb);
+        }
     };
 
-    const observerId = effectManager.addObserver(effects, handledCb);
+    handledCb();
 
     return {
-        pause: () => {
+        stop: () => {
+            clearTimeout(timeout);
             effectManager.removeObserver(observerId);
         },
         resume: () => {
-            effectManager.addObserver(effects, handledCb, observerId);
+            handledCb();
+            effectManager.addObserver(currentEffects, handledCb, observerId);
         }
     };
 }
