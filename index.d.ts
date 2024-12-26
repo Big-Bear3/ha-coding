@@ -35,36 +35,24 @@ export function onChange<T>(
 export function onKeep(
     statesJudger: () => boolean,
     cb: () => void,
-    keepTime: number
+    keepTime?: number
 ): {
     stop: () => void;
     resume: () => void;
 };
 
-export function stage<T extends [Parameters<typeof onChange>, Parameters<typeof onChange>, ...Parameters<typeof onChange>[]]>(
+export function stage<T extends [ReturnType<typeof step<any>>, ReturnType<typeof step<any>>, ...ReturnType<typeof step<any>>[]]>(
     ...steps: T
 ): {
-    next: () => void;
-    prev: () => void;
+    next: (waitingTime?: number) => void;
+    prev: (waitingTime?: number) => void;
     goto: (stepIndex: ArrayIndexes<T>) => void;
     reset: () => void;
     pause: () => void;
     resume: () => void;
 };
 
-export function step<T>(
-    statesGetter: () => T,
-    cb: (states: CbStates<T>, oldStates: CbStates<T>) => void,
-    onChangeOptions?: {
-        immediate?: boolean;
-    }
-): [
-    statesGetter: () => T,
-    cb: (states: CbStates<T>, oldStates: CbStates<T>) => void,
-    onChangeOptions?: {
-        immediate?: boolean;
-    }
-];
+export function step<T>(...args: Parameters<typeof onChange<T>>): Parameters<typeof onChange<T>>;
 
 export class Timer {
     constructor();

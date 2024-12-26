@@ -60,3 +60,42 @@ describe('混合状态持续', () => {
         }, 469);
     }, 1);
 });
+
+describe('停止&恢复', () => {
+    const light = new MiLight();
+    let flag = 0;
+
+    setTimeout(() => {
+        const { stop, resume } = onKeep(
+            () => light.status > 2,
+            () => {
+                flag++;
+            },
+            200
+        );
+
+        light.status = 3;
+
+        setTimeout(() => {
+            assert.strictEqual(flag, 1);
+            light.status = 0;
+            stop();
+        }, 219);
+
+        setTimeout(() => {
+            light.status = 4;
+        }, 220);
+
+        setTimeout(() => {
+            resume();
+        }, 400);
+
+        setTimeout(() => {
+            assert.strictEqual(flag, 1);
+        }, 439);
+
+        setTimeout(() => {
+            assert.strictEqual(flag, 2);
+        }, 619);
+    }, 1);
+});

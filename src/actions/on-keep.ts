@@ -1,6 +1,6 @@
 import { Effect, EffectManager } from '../managers/effect-manager.js';
 
-export function onKeep(statesJudger: () => boolean, cb: () => void, keepTime: number) {
+export function onKeep(statesJudger: () => boolean, cb: () => void, keepTime?: number) {
     const effectManager = EffectManager.instance;
 
     let timeout: NodeJS.Timeout;
@@ -17,7 +17,7 @@ export function onKeep(statesJudger: () => boolean, cb: () => void, keepTime: nu
             timeout = setTimeout(() => {
                 cb();
                 timeout = null;
-            }, keepTime);
+            }, keepTime ?? 0);
         } else {
             clearTimeout(timeout);
             timeout = null;

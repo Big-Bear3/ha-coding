@@ -6,18 +6,19 @@ export function stage(...steps: Parameters<typeof onChange>[]) {
     let waitingTimeout: NodeJS.Timeout;
 
     const goto = (stepIndex: number, waitingTime?: number) => {
+        if (stepIndex > steps.length - 1 || stepIndex < 0) {
+            reset();
+            return;
+        }
+
         clearTimeout(waitingTimeout);
-        if (stepIndex > 0 && waitingTime > 0) {
+        if (stepIndex > 0 && waitingTime && waitingTime > 0) {
             waitingTimeout = setTimeout(() => {
                 reset();
             }, waitingTime);
         }
 
         if (stepIndex === currentStepIndex) return;
-        if (stepIndex > steps.length - 1 || stepIndex < 0) {
-            currentStepIndex = 0;
-            return;
-        }
 
         currentStepIndex = stepIndex;
         for (let i = 0; i < onChangeOperations.length; i++) {
@@ -34,9 +35,9 @@ export function stage(...steps: Parameters<typeof onChange>[]) {
         }
     };
 
-    const next = (waitingTime?: number) => goto(++currentStepIndex, waitingTime);
+    const next = (waitingTime?: number) => goto(currentStepIndex + 1, waitingTime);
 
-    const prev = (waitingTime?: number) => goto(--currentStepIndex, waitingTime);
+    const prev = (waitingTime?: number) => goto(currentStepIndex - 1, waitingTime);
 
     const reset = () => goto(0);
 
