@@ -8,5 +8,8 @@ import { Timer } from './actions/timer.js';
 import { delay } from './actions/delay.js';
 import { ref } from './objects/ref.js';
 import { cloneDeep, isEqual } from 'lodash-es';
+import { initHACoding } from './services/app-service.js';
 
-export { Device, State, Action, onChange, onKeep, stage, step, Timer, delay, ref, cloneDeep, isEqual };
+import('./app/app.js');
+
+export { Device, State, Action, onChange, onKeep, stage, step, Timer, delay, ref, cloneDeep, isEqual, initHACoding };

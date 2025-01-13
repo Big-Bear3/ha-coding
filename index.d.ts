@@ -67,3 +67,5 @@ export function ref<T>(value?: T): Ref<T>;
 export function cloneDeep<T>(value: T): T;
 
 export function isEqual(value: any, other: any): boolean;
+
+export async function initHACoding(): Promise<void>;

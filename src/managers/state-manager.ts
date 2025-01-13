@@ -1,3 +1,4 @@
+import { CallInfoGetter, CallService } from '../services/call-service';
 import type { Ref } from '../objects/ref';
 import type { Class, MethodDescriptor, ObjectKey, ObjectType } from '../types/types';
 import { EffectManager } from './effect-manager.js';
@@ -6,6 +7,7 @@ import { cloneDeep, isEqual } from 'lodash-es';
 interface StateInfo {
     name: ObjectKey;
     type: 'state' | 'action';
+    callInfoGetter?: CallInfoGetter;
     originalActionFn?: (...args: unknown[]) => unknown;
 }
 
@@ -25,12 +27,13 @@ export class StateManager {
 
     private constructor() {}
 
-    handleState(c: Class, key: ObjectKey): void {
+    handleState(c: Class, key: ObjectKey, callInfoGetter: CallInfoGetter): void {
         const effectManager = EffectManager.instance;
 
         this.setClassState(c, {
             name: key,
-            type: 'state'
+            type: 'state',
+            callInfoGetter
         });
 
         Reflect.defineProperty(c, key, {
@@ -46,6 +49,10 @@ export class StateManager {
                 if (isEqual(value, oldValue)) return;
 
                 StateManager.instance.setStateValue(this, key, value);
+
+                const callInfo = callInfoGetter(value);
+                callInfo.entityId = this.entityId;
+                CallService.instance.push(callInfo);
 
                 effectManager.broadcast({ effect: { c, instance: this, state: key, stateType: 'state' }, value, oldValue });
             }
