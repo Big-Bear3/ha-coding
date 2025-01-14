@@ -1,6 +1,6 @@
 import { nextTick } from 'process';
 import { HACallData } from 'src/types/ha-types';
-import { HAWebsocketService } from './ha-websocket-service';
+import { HAWebsocketService } from './ha-websocket-service.js';
 
 export interface CallInfo {
     entityId?: string;
@@ -13,9 +13,19 @@ export type CallInfoGetter = (value: any) => CallInfo;
 export class CallService {
     static #instance: CallService;
 
-    #callingQueue: CallInfo[];
+    #callingQueue: CallInfo[] = [];
 
     #callingIsActivated = false;
+
+    #callable = true;
+
+    set callable(value: boolean) {
+        this.#callable = value;
+    }
+
+    get callable() {
+        return this.#callable;
+    }
 
     private constructor() {}
 

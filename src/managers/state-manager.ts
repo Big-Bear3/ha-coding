@@ -1,4 +1,4 @@
-import { CallInfoGetter, CallService } from '../services/call-service';
+import { CallInfoGetter, CallService } from '../services/call-service.js';
 import type { Ref } from '../objects/ref';
 import type { Class, MethodDescriptor, ObjectKey, ObjectType } from '../types/types';
 import { EffectManager } from './effect-manager.js';
@@ -50,9 +50,13 @@ export class StateManager {
 
                 StateManager.instance.setStateValue(this, key, value);
 
-                const callInfo = callInfoGetter(value);
-                callInfo.entityId = this.entityId;
-                CallService.instance.push(callInfo);
+                const callService = CallService.instance;
+
+                if (callService.callable) {
+                    const callInfo = callInfoGetter(value);
+                    callInfo.entityId = this.entityId;
+                    callService.push(callInfo);
+                }
 
                 effectManager.broadcast({ effect: { c, instance: this, state: key, stateType: 'state' }, value, oldValue });
             }

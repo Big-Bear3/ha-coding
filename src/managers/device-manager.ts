@@ -11,8 +11,16 @@ export class DeviceManager {
 
     private constructor() {}
 
-    registerDevice(deviceInfo: Device): void {
-        this.devicesMap.set(deviceInfo._entityId, deviceInfo);
+    registerDevice(device: Device): void {
+        this.devicesMap.set(device._entityId, device);
+    }
+
+    hasDevice(entityId: string): boolean {
+        return this.devicesMap.has(entityId);
+    }
+
+    getDevice(entityId: string): Device {
+        return this.devicesMap.get(entityId);
     }
 
     static get instance(): DeviceManager {

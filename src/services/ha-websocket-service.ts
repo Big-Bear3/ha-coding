@@ -1,7 +1,9 @@
+import type { ObjectType } from '../types/types';
 import WebSocket from 'ws';
 import { HA_WEBSOCKET_ADDRESS } from '../config/config.js';
 import { AppService } from './app-service.js';
-import { ObjectType } from 'src/types/types.js';
+import { EventService } from './event-service.js';
+import { HAEvent } from '../types/ha-types';
 
 export class HAWebsocketService {
     static #instance: HAWebsocketService;
@@ -26,8 +28,22 @@ export class HAWebsocketService {
 
             this.#ws.onmessage = (msg: WebSocket.MessageEvent) => {
                 const msgData = JSON.parse(msg.data as string);
-                if (msgData.type === 'auth_required') {
-                    this.auth();
+
+                switch (msgData.type) {
+                    case 'auth_required':
+                        this.auth();
+                        break;
+                    case 'event':
+                        if (!msgData.event.c || typeof msgData.event.c !== 'object') return;
+
+                        const entityId = Object.keys(msgData.event.c)?.[0];
+                        if (!entityId) return;
+
+                        const event: HAEvent = msgData.event.c[entityId]['+'];
+
+                        EventService.instance.handleEvent(entityId, event);
+
+                        break;
                 }
 
                 console.log(msg.data);
