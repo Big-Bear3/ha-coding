@@ -6,22 +6,34 @@ import { ref } from '../../src/objects/ref.js';
 @Device()
 export class MiLight {
     @State(() => {
-        return null;
+        return {
+            service: '',
+            serviceData: {}
+        };
     })
     status: number;
 
     @State(() => {
-        return null;
+        return {
+            service: '',
+            serviceData: {}
+        };
     })
     brightness: string;
 
     @State(() => {
-        return null;
+        return {
+            service: '',
+            serviceData: {}
+        };
     })
     colorTemperature = 4000;
 
     @State(() => {
-        return null;
+        return {
+            service: '',
+            serviceData: {}
+        };
     })
     gradient = {
         on: 1000,
@@ -29,7 +41,10 @@ export class MiLight {
     };
 
     @State(() => {
-        return null;
+        return {
+            service: '',
+            serviceData: {}
+        };
     })
     color = ref('red');
 

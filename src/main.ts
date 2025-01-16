@@ -17,7 +17,8 @@ import {
     isNotWorkDay,
     getSunInfo,
     getSunriseTime,
-    getSunsetTime
+    getSunsetTime,
+    inTimeRange
 } from './utils/app-utils.js';
 import { initHACoding } from './services/app-service.js';
 import { createDevice } from './actions/create-device.js';
@@ -45,6 +46,7 @@ export {
     getSunInfo,
     getSunriseTime,
     getSunsetTime,
+    inTimeRange,
     initHACoding,
     createDevice
 };

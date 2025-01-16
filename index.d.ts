@@ -141,7 +141,7 @@ export function getSunInfo(date?: DateStr): SunInfo;
 export function getSunriseTime(date?: DateStr): TimeStr;
 export function getSunsetTime(date?: DateStr): TimeStr;
 
-export function inTimeRange(): boolean;
+export function inTimeRange(startTime: TimeStr, endTime: TimeStr): boolean;
 
 export async function initHACoding(): Promise<void>;
 

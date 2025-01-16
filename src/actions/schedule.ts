@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import type { DateStr, RepeatType, TimeStr } from '../types/types';
 import { isWeekDay, isWeekend, isWorkDay, isNotWorkDay } from '../utils/app-utils.js';
-import { timeStrToTimeMillis } from 'src/utils/date-time-utils';
+import { timeStrToTimeMillis } from '../utils/date-time-utils.js';
 
 interface ScheduleTask {
     taskId: number;
