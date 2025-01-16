@@ -10,10 +10,10 @@ export class HAWebsocketService {
 
     #ws: WebSocket;
 
-    #msgId = 1;
+    #currentMsgId = 0;
 
-    get msgId() {
-        return this.#msgId++;
+    get newMsgId() {
+        return ++this.#currentMsgId;
     }
 
     private constructor() {}
@@ -75,7 +75,7 @@ export class HAWebsocketService {
 
     private subscribe(): void {
         const param = {
-            id: this.msgId,
+            id: this.newMsgId,
             type: 'subscribe_entities'
         };
 

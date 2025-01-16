@@ -45,7 +45,7 @@ export class CallService {
         const haWebsocketService = HAWebsocketService.instance;
         for (const callInfo of this.#callingQueue) {
             const callData: HACallData = {
-                id: haWebsocketService.msgId,
+                id: haWebsocketService.newMsgId,
                 domain: this.getDomain(callInfo.entityId),
                 return_response: false,
                 service: callInfo.service,

@@ -21,7 +21,7 @@ export interface ObserverInfo {
 export class EffectManager {
     static #instance: EffectManager;
 
-    static #observerId = 1;
+    static #currentObserverId = 0;
 
     readonly #effectsToObserver = new Map<Effect[], ObserverInfo>();
 
@@ -33,8 +33,8 @@ export class EffectManager {
 
     #isTracking = false;
 
-    get newObserverId(): number {
-        return EffectManager.#observerId++;
+    private get newObserverId(): number {
+        return ++EffectManager.#currentObserverId;
     }
 
     private constructor() {}

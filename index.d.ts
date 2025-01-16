@@ -10,9 +10,68 @@ type MapToValueOrReturnValue<T extends readonly any[], U extends any[] = []> = T
 
 type CbStates<T> = T extends readonly any[] ? MapToValueOrReturnValue<T> : ValueOrReturnValue<T>;
 
+export type Class<T = any> = new (...args: any[]) => T;
+
+export type ObjectKey = string | symbol | number;
+export type ObjectType = Record<ObjectKey, any>;
+
+export type WEEK = 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN';
+
+export type RepeatType =
+    | 'EVERY_DAY'
+    | 'WEEK_DAY'
+    | 'WEEKEND'
+    | 'WORK_DAY'
+    | 'NON_WORK_DAY'
+    | WEEK[]
+    | ((date: DateStr, week: number) => boolean);
+
+export type DateStr = `${'2025' | '2026' | '2027' | '2028' | '2029' | '2030'}-${string}-${string}`;
+
+// prettier-ignore
+type Hours = '00' | '01' | '02' | '03' | '04' | '05' | '06' | '07' | '08' | '09' | '10' | '11' |
+             '12' | '13' | '14' | '15' | '16' | '17' | '18' | '19' | '20' | '21' | '22' | '23';
+
+// prettier-ignore
+type MinutesOrSeconds = '00' | '01' | '02' | '03' | '04' | '05' | '06' | '07' | '08' | '09' | '10' | '11' |
+                        '12' | '13' | '14' | '15' | '16' | '17' | '18' | '19' | '20' | '21' | '22' | '23' |
+                        '24' | '25' | '26' | '27' | '28' | '29' | '30' | '31' | '32' | '33' | '34' | '35' |
+                        '36' | '37' | '38' | '39' | '40' | '41' | '42' | '43' | '44' | '45' | '46' | '47' |
+                        '48' | '49' | '50' | '51' | '52' | '53' | '54' | '55' | '56' | '57' | '58' | '59';
+
+export type TimeStr = `${Hours}:${MinutesOrSeconds}:${MinutesOrSeconds}`;
+
+export interface SunInfo {
+    dawn: Date;
+    dusk: Date;
+    goldenHour: Date;
+    goldenHourEnd: Date;
+    nadir: Date;
+    nauticalDawn: Date;
+    nauticalDusk: Date;
+    night: Date;
+    nightEnd: Date;
+    solarNoon: Date;
+    sunrise: Date;
+    sunriseEnd: Date;
+    sunset: Date;
+    sunsetStart: Date;
+}
+
+export interface HAEvent<A = any, S = any> {
+    a: A;
+    c: string;
+    lc: number;
+    s: S;
+}
+
 export interface Ref<T = any> {
     value: T;
     trigger: () => void;
+}
+
+export interface DeviceDef {
+    $onEvent(haEvent: HAEvent): void;
 }
 
 export function Device(): ClassDecorator;
@@ -62,10 +121,28 @@ export class Timer {
 
 export function delay(cb: () => void, time: number): () => void;
 
+export function schedule(
+    time: TimeStr | number | ((date: DateStr, week: number) => TimeStr | number),
+    cb: () => void,
+    repeatType: RepeatType = 'EVERY_DAY'
+);
+
 export function ref<T>(value?: T): Ref<T>;
 
 export function cloneDeep<T>(value: T): T;
-
 export function isEqual(value: any, other: any): boolean;
 
+export function isWeekDay(date?: DateStr): boolean;
+export function isWeekend(date?: DateStr): boolean;
+export function isWorkDay(date?: DateStr): boolean;
+export function isNotWorkDay(date?: DateStr): boolean;
+
+export function getSunInfo(date?: DateStr): SunInfo;
+export function getSunriseTime(date?: DateStr): TimeStr;
+export function getSunsetTime(date?: DateStr): TimeStr;
+
+export function inTimeRange(): boolean;
+
 export async function initHACoding(): Promise<void>;
+
+export async function createDevice<T extends DeviceDef>(deviceDef: Class<T>, entityId: string): T;

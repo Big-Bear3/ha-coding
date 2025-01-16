@@ -5,7 +5,7 @@ export class DeviceManager {
 
     #devicesMap = new Map<string, Device>();
 
-    get devicesMap() {
+    private get devicesMap() {
         return this.#devicesMap;
     }
 

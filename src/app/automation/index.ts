@@ -1,1 +1,1 @@
-export {};
+import './bathroom-light-automation.js';
