@@ -6,6 +6,8 @@ export const HA_USER_NAME = 'qm';
 
 export const HA_PASSWORD = '1234@Qwer';
 
+export const IMMEDIATE_CALL = false;
+
 export const HOLIDAYS = [
     '2025-01-01', // 元旦
 

@@ -1,6 +1,7 @@
 import { nextTick } from 'process';
 import { HACallData } from 'src/types/ha-types';
 import { HAWebsocketService } from './ha-websocket-service.js';
+import { IMMEDIATE_CALL } from '../config/config.js';
 
 export interface CallInfo {
     entityId?: string;
@@ -35,9 +36,13 @@ export class CallService {
         if (!this.#callingIsActivated) {
             this.#callingIsActivated = true;
 
-            nextTick(() => {
+            if (IMMEDIATE_CALL) {
                 this.call();
-            });
+            } else {
+                nextTick(() => {
+                    this.call();
+                });
+            }
         }
     }
 
