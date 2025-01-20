@@ -38,7 +38,7 @@ export async function initHACoding(): Promise<void> {
 
     try {
         await appService.refreshAccessToken();
-        HAWebsocketService.instance.createHAWebsocket();
+        await HAWebsocketService.instance.createHAWebsocket();
     } catch (error) {
         console.log(error);
     }

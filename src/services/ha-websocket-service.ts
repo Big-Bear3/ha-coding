@@ -10,7 +10,11 @@ export class HAWebsocketService {
 
     #ws: WebSocket;
 
-    #currentMsgId = 0;
+    #currentMsgId = 100;
+
+    readonly #subscribeMsgId = 3;
+
+    #haWebsocketReady = false;
 
     get newMsgId() {
         return ++this.#currentMsgId;
@@ -18,37 +22,48 @@ export class HAWebsocketService {
 
     private constructor() {}
 
-    createHAWebsocket(): void {
-        this.#ws = new WebSocket(HA_WEBSOCKET_ADDRESS);
+    createHAWebsocket(): Promise<void> {
+        return new Promise<void>((resolve) => {
+            this.#ws = new WebSocket(HA_WEBSOCKET_ADDRESS);
 
-        this.#ws.onopen = (): void => {
-            this.timedAuth();
+            this.#ws.onopen = (): void => {
+                this.timedAuth();
 
-            this.subscribe();
+                this.subscribe();
 
-            this.#ws.onmessage = (msg: WebSocket.MessageEvent) => {
-                const msgData = JSON.parse(msg.data as string);
+                this.#ws.onmessage = (msg: WebSocket.MessageEvent) => {
+                    const msgData = JSON.parse(msg.data as string);
 
-                switch (msgData.type) {
-                    case 'auth_required':
-                        this.auth();
-                        break;
-                    case 'event':
-                        if (!msgData.event.c || typeof msgData.event.c !== 'object') return;
+                    switch (msgData.type) {
+                        case 'auth_required':
+                            this.auth();
+                            break;
+                        case 'event':
+                            if (msgData.id !== this.#subscribeMsgId) return;
 
-                        const entityId = Object.keys(msgData.event.c)?.[0];
-                        if (!entityId) return;
+                            if (msgData.event.a && !this.#haWebsocketReady) {
+                                for (const [entityId, event] of Object.entries<HAEvent>(msgData.event.a)) {
+                                    EventService.instance.handleEvent(entityId, event);
+                                }
+                                this.#haWebsocketReady = true;
+                                resolve();
+                                return;
+                            }
 
-                        const event: HAEvent = msgData.event.c[entityId]['+'];
+                            if (!msgData.event.c || typeof msgData.event.c !== 'object') return;
 
-                        EventService.instance.handleEvent(entityId, event);
+                            const entityId = Object.keys(msgData.event.c)?.[0];
+                            if (!entityId) return;
 
-                        break;
-                }
+                            const event: HAEvent = msgData.event.c[entityId]['+'];
 
-                console.log(msg.data);
+                            EventService.instance.handleEvent(entityId, event);
+
+                            break;
+                    }
+                };
             };
-        };
+        });
     }
 
     send(msg: string | ObjectType): void {
@@ -75,7 +90,7 @@ export class HAWebsocketService {
 
     private subscribe(): void {
         const param = {
-            id: this.newMsgId,
+            id: this.#subscribeMsgId,
             type: 'subscribe_entities'
         };
 

@@ -14,7 +14,7 @@ export class EventService {
 
         const callService = CallService.instance;
         callService.callable = false;
-        device.$onEvent(event);
+        device.$onEvent(event, entityId);
         callService.callable = true;
     }
 

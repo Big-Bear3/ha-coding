@@ -1,7 +1,7 @@
 import { initHACoding } from '../../index.js';
 
+import('./devices.js');
+
 initHACoding().then(() => {
-    import('./devices.js').then(() => {
-        import('./automation/index.js');
-    });
+    import('./automation/index.js');
 });

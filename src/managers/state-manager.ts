@@ -27,7 +27,7 @@ export class StateManager {
 
     private constructor() {}
 
-    handleState(c: Class, key: ObjectKey, callInfoGetter: CallInfoGetter): void {
+    handleState(c: Class, key: ObjectKey, callInfoGetter?: CallInfoGetter): void {
         const effectManager = EffectManager.instance;
 
         this.setClassState(c, {
@@ -52,9 +52,8 @@ export class StateManager {
 
                 const callService = CallService.instance;
 
-                if (callService.callable) {
+                if (callService.callable && callInfoGetter) {
                     const callInfo = callInfoGetter(value);
-                    callInfo.entityId = this.entityId;
                     callService.push(callInfo);
                 }
 
@@ -110,7 +109,7 @@ export class StateManager {
         const effectManager = EffectManager.instance;
         const stateInfos = this.#classToStates.get(c);
 
-        for (const stateInfo of stateInfos) {
+        for (const stateInfo of stateInfos ?? []) {
             if (stateInfo.type === 'state') continue;
 
             Reflect.defineProperty(c, stateInfo.name, {

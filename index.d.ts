@@ -71,12 +71,21 @@ export interface Ref<T = any> {
 }
 
 export interface DeviceDef {
-    $onEvent(haEvent: HAEvent): void;
+    $entityIds: Record<string, string>;
+    $onEvent(haEvent: HAEvent, entityId: string): void;
 }
+
+export interface CallInfo {
+    entityId: string;
+    service: string;
+    serviceData?: Record<string, any>;
+}
+
+export type CallInfoGetter = (value: any) => CallInfo;
 
 export function Device(): ClassDecorator;
 
-export function State(): PropertyDecorator;
+export function State(callInfoGetter?: CallInfoGetter): PropertyDecorator;
 
 export function Action(): MethodDecorator;
 
@@ -145,4 +154,8 @@ export function inTimeRange(startTime: TimeStr, endTime: TimeStr): boolean;
 
 export async function initHACoding(): Promise<void>;
 
-export async function createDevice<T extends DeviceDef>(deviceDef: Class<T>, entityId: string): T;
+export function createDevice<T extends Class<DeviceDef>>(
+    deviceDef: T,
+    entityIds: InstanceType<T>['$entityIds'],
+    ...cps: ConstructorParameters<T>
+): InstanceType<T>;

@@ -1,42 +1,47 @@
 import type { HAEvent } from '../../types/ha-types';
 import type { DeviceDef } from '../../types/types';
-import { Device } from '../../decorators/device.js';
-import { State } from '../../decorators/state.js';
+import { Device, State } from '../../../index.js';
 
-type MiMesh2LightEvent = HAEvent<{ brightness: number; color_temp_kelvin: number }, 'on' | 'off'>;
+type MiLightEvent = HAEvent<{ brightness: number; color_temp_kelvin: number }, 'on' | 'off'>;
 
 @Device()
-export class MiMesh2Light implements DeviceDef {
-    @State(function (value: MiMesh2Light['status']) {
-        return { service: value === 1 ? 'turn_on' : 'turn_off' };
-    })
-    status: 0 | 1;
+export class MiLight implements DeviceDef {
+    $entityIds: { light: string };
 
-    @State(function (value: MiMesh2Light['status']) {
+    @State(function (this: MiLight, value: MiLight['on']) {
+        return { service: value ? 'turn_on' : 'turn_off', entityId: this.$entityIds.light };
+    })
+    on: boolean;
+
+    @State(function (this: MiLight, value: MiLight['on']) {
         return {
             service: 'turn_on',
             serviceData: {
                 brightness_pct: value
-            }
+            },
+            entityId: this.$entityIds.light
         };
     })
     brightness: number;
 
-    @State(function (value: MiMesh2Light['status']) {
+    @State(function (this: MiLight, value: MiLight['on']) {
         return {
             service: 'turn_on',
             serviceData: {
                 color_temp_kelvin: value
-            }
+            },
+            entityId: this.$entityIds.light
         };
     })
     colorTemperature: number;
 
-    $onEvent({ a, s }: MiMesh2LightEvent): void {
+    $onEvent({ a, s }: MiLightEvent, entityId: string): void {
+        if (entityId !== this.$entityIds.light) return;
+
         if (s === 'on') {
-            this.status = 1;
+            this.on = true;
         } else if (s === 'off') {
-            this.status = 0;
+            this.on = false;
         }
 
         if (a.brightness !== undefined && a.brightness !== null) {

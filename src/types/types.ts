@@ -13,7 +13,8 @@ export interface MethodDescriptor {
 }
 
 export interface DeviceDef {
-    $onEvent(haEvent: HAEvent): void;
+    $entityIds: Record<string, string>;
+    $onEvent(haEvent: HAEvent, entityId: string): void;
 }
 
 export type WEEK = 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN';

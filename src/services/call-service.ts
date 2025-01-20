@@ -4,7 +4,7 @@ import { HAWebsocketService } from './ha-websocket-service.js';
 import { IMMEDIATE_CALL } from '../config/config.js';
 
 export interface CallInfo {
-    entityId?: string;
+    entityId: string;
     service: string;
     serviceData?: Record<string, any>;
 }

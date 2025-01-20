@@ -12,7 +12,9 @@ export class DeviceManager {
     private constructor() {}
 
     registerDevice(device: Device): void {
-        this.devicesMap.set(device._entityId, device);
+        for (const entityId of Object.keys(device.$entityIds)) {
+            this.devicesMap.set(entityId, device);
+        }
     }
 
     hasDevice(entityId: string): boolean {

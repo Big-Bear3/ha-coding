@@ -8,7 +8,8 @@ export class MiLight {
     @State(() => {
         return {
             service: '',
-            serviceData: {}
+            serviceData: {},
+            entityId: ''
         };
     })
     status: number;
@@ -16,7 +17,8 @@ export class MiLight {
     @State(() => {
         return {
             service: '',
-            serviceData: {}
+            serviceData: {},
+            entityId: ''
         };
     })
     brightness: string;
@@ -24,7 +26,8 @@ export class MiLight {
     @State(() => {
         return {
             service: '',
-            serviceData: {}
+            serviceData: {},
+            entityId: ''
         };
     })
     colorTemperature = 4000;
@@ -32,7 +35,8 @@ export class MiLight {
     @State(() => {
         return {
             service: '',
-            serviceData: {}
+            serviceData: {},
+            entityId: ''
         };
     })
     gradient = {
@@ -43,7 +47,8 @@ export class MiLight {
     @State(() => {
         return {
             service: '',
-            serviceData: {}
+            serviceData: {},
+            entityId: ''
         };
     })
     color = ref('red');
