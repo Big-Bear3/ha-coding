@@ -1,6 +1,6 @@
 import type { ObjectType } from '../types/types';
 import WebSocket from 'ws';
-import { HA_WEBSOCKET_ADDRESS } from '../config/config.js';
+import { GEOGRAPHIC_LOCATION, HA_WEBSOCKET_ADDRESS } from '../config/config.js';
 import { AppService } from './app-service.js';
 import { EventService } from './event-service.js';
 import { HAEvent } from '../types/ha-types';
@@ -10,9 +10,11 @@ export class HAWebsocketService {
 
     #ws: WebSocket;
 
-    #currentMsgId = 100;
+    #currentMsgId = 0;
 
-    readonly #subscribeMsgId = 3;
+    #getConfigId: number;
+
+    #subscribeMsgId: number;
 
     #haWebsocketReady = false;
 
@@ -29,6 +31,7 @@ export class HAWebsocketService {
             this.#ws.onopen = async (): Promise<void> => {
                 await this.auth();
 
+                this.getConfig();
                 this.subscribeEntities();
 
                 this.#ws.onmessage = async (msg: WebSocket.MessageEvent) => {
@@ -40,6 +43,7 @@ export class HAWebsocketService {
                                 await this.auth();
                                 this.subscribeEntities();
                                 break;
+
                             case 'event':
                                 if (msgData.id !== this.#subscribeMsgId) return;
 
@@ -62,6 +66,13 @@ export class HAWebsocketService {
                                 EventService.instance.handleEvent(entityId, event);
 
                                 break;
+
+                            case 'result':
+                                if (msgData.id === this.#getConfigId) {
+                                    GEOGRAPHIC_LOCATION[0] = msgData.result.latitude;
+                                    GEOGRAPHIC_LOCATION[1] = msgData.result.longitude;
+                                    GEOGRAPHIC_LOCATION[2] = msgData.result.elevation;
+                                }
                         }
                     } catch (error) {
                         console.error(error);
@@ -87,7 +98,20 @@ export class HAWebsocketService {
         });
     }
 
+    private getConfig(): void {
+        this.#getConfigId = this.newMsgId;
+
+        const param = {
+            id: this.#getConfigId,
+            type: 'get_config'
+        };
+
+        this.send(param);
+    }
+
     private subscribeEntities(): void {
+        this.#subscribeMsgId = this.newMsgId;
+
         const param = {
             id: this.#subscribeMsgId,
             type: 'subscribe_entities'
