@@ -31,6 +31,7 @@ export class AppService {
 
 export async function initHACoding(): Promise<void> {
     try {
+        await import('../config/config.js');
         await HAWebsocketService.instance.createHAWebsocket();
     } catch (error) {
         console.error(error);

@@ -1,12 +1,24 @@
-export const IP_ADDRESS_PORT = '192.168.31.156:8123';
+const configPathExternal = '../../../../config.js';
+const configPathInternal = '../../config.js';
+let configModule: any;
+
+try {
+    configModule = await import(configPathExternal);
+} catch (error) {
+    configModule = await import(configPathInternal);
+}
+
+const config = configModule.default;
+
+export const IP_ADDRESS_PORT: string = config.IP_ADDRESS_PORT;
+
+export const HA_USER_NAME: string = config.HA_USER_NAME;
+
+export const HA_PASSWORD: string = config.HA_PASSWORD;
+
+export const IMMEDIATE_CALL: boolean = config.IMMEDIATE_CALL ?? false;
 
 export const HA_WEBSOCKET_ADDRESS = `ws://${IP_ADDRESS_PORT}/api/websocket`;
-
-export const HA_USER_NAME = 'qm';
-
-export const HA_PASSWORD = '1234@Qwer';
-
-export const IMMEDIATE_CALL = false;
 
 export const HOLIDAYS = [
     '2025-01-01', // 元旦
