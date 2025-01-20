@@ -133,7 +133,7 @@ export function delay(cb: () => void, time: number): () => void;
 export function schedule(
     time: TimeStr | number | ((date: DateStr, week: number) => TimeStr | number),
     cb: () => void,
-    repeatType: RepeatType = 'EVERY_DAY'
+    repeatType: RepeatType
 );
 
 export function ref<T>(value?: T): Ref<T>;
@@ -152,7 +152,7 @@ export function getSunsetTime(date?: DateStr): TimeStr;
 
 export function inTimeRange(startTime: TimeStr, endTime: TimeStr): boolean;
 
-export async function initHACoding(): Promise<void>;
+export function initHACoding(): Promise<void>;
 
 export function createDevice<T extends Class<DeviceDef>>(
     deviceDef: T,
