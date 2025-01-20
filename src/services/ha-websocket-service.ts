@@ -26,8 +26,8 @@ export class HAWebsocketService {
         return new Promise<void>((resolve) => {
             this.#ws = new WebSocket(HA_WEBSOCKET_ADDRESS);
 
-            this.#ws.onopen = (): void => {
-                this.timedAuth();
+            this.#ws.onopen = async (): Promise<void> => {
+                await this.timedAuth();
 
                 this.subscribe();
 
@@ -36,7 +36,10 @@ export class HAWebsocketService {
 
                     switch (msgData.type) {
                         case 'auth_required':
-                            this.auth();
+                            this.send({
+                                access_token: AppService.instance.haAccessToken,
+                                type: 'auth'
+                            });
                             break;
                         case 'event':
                             if (msgData.id !== this.#subscribeMsgId) return;
@@ -74,15 +77,13 @@ export class HAWebsocketService {
         }
     }
 
-    private auth(): void {
+    private async timedAuth(): Promise<void> {
+        await AppService.instance.refreshAccessToken();
         this.send({
             access_token: AppService.instance.haAccessToken,
             type: 'auth'
         });
-    }
 
-    private timedAuth(): void {
-        this.auth();
         setTimeout(() => {
             this.timedAuth();
         }, 29 * 60 * 1000);

@@ -6,25 +6,25 @@ export class AppService {
 
     #haAccessToken: string;
 
+    #loginResult: string;
+
     get haAccessToken() {
         return this.#haAccessToken;
     }
 
     private constructor() {}
 
-    async refreshAccessToken(): Promise<string> {
+    async login(): Promise<void> {
         const loginInfoRes = await getLoginInfo();
         const flowId: string = loginInfoRes.flow_id;
 
         const loginRes = await login(flowId);
-        const result: string = loginRes.result;
+        this.#loginResult = loginRes.result;
+    }
 
-        const tokenRes = await getToken(result);
-        const accessToken: string = tokenRes.access_token;
-
-        this.#haAccessToken = accessToken;
-
-        return accessToken;
+    async refreshAccessToken(): Promise<void> {
+        const tokenRes = await getToken(this.#loginResult);
+        this.#haAccessToken = tokenRes.access_token;
     }
 
     static get instance(): AppService {
@@ -37,7 +37,7 @@ export async function initHACoding(): Promise<void> {
     const appService = AppService.instance;
 
     try {
-        await appService.refreshAccessToken();
+        await appService.login();
         await HAWebsocketService.instance.createHAWebsocket();
     } catch (error) {
         console.log(error);
