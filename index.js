@@ -1,3 +1,3 @@
-// import './src/test.js';
+import './src/test.js';
 
 export * from './src/main.js';

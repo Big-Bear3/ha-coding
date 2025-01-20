@@ -4,7 +4,8 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "build-for-debug": "tsc --outDir .dist",
+        "build": "tsc --sourceMap false --outDir .dist && copy index.js .dist && rd /s /q .dist\\tests",
+        "build-for-debug": "tsc --outDir .dist && copy index.js .dist",
         "start": "tsc --outDir .dist && copy index.js .dist && node .dist/index.js",
         "test": "tsc --outDir .dist && copy index.js .dist && cd .dist/tests && node index.js"
     },
