@@ -77,7 +77,11 @@ export class EffectManager {
             }
 
             for (const targetObserverInfo of targetObserverInfos) {
-                targetObserverInfo.observer();
+                try {
+                    targetObserverInfo.observer();
+                } catch (error) {
+                    console.error(error);
+                }
             }
 
             this.#currentEffectValues.clear();

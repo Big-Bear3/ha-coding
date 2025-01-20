@@ -47,23 +47,27 @@ export class CallService {
     }
 
     call(): void {
-        const haWebsocketService = HAWebsocketService.instance;
-        for (const callInfo of this.#callingQueue) {
-            const callData: HACallData = {
-                id: haWebsocketService.newMsgId,
-                domain: this.getDomain(callInfo.entityId),
-                return_response: false,
-                service: callInfo.service,
-                service_data: {
-                    entity_id: callInfo.entityId,
-                    ...callInfo.serviceData
-                },
-                type: 'call_service'
-            };
-            haWebsocketService.send(callData);
+        try {
+            const haWebsocketService = HAWebsocketService.instance;
+            for (const callInfo of this.#callingQueue) {
+                const callData: HACallData = {
+                    id: haWebsocketService.newMsgId,
+                    domain: this.getDomain(callInfo.entityId),
+                    return_response: false,
+                    service: callInfo.service,
+                    service_data: {
+                        entity_id: callInfo.entityId,
+                        ...callInfo.serviceData
+                    },
+                    type: 'call_service'
+                };
+                haWebsocketService.send(callData);
+            }
+            this.#callingQueue.splice(0);
+            this.#callingIsActivated = false;
+        } catch (error) {
+            console.error(error);
         }
-        this.#callingQueue.splice(0);
-        this.#callingIsActivated = false;
     }
 
     private getDomain(entityId: string): string {

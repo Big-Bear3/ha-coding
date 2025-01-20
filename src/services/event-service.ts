@@ -8,14 +8,18 @@ export class EventService {
     private constructor() {}
 
     handleEvent(entityId: string, event: HAEvent): void {
-        const deviceManager = DeviceManager.instance;
-        const device = deviceManager.getDevice(entityId);
-        if (!device) return;
+        try {
+            const deviceManager = DeviceManager.instance;
+            const device = deviceManager.getDevice(entityId);
+            if (!device) return;
 
-        const callService = CallService.instance;
-        callService.callable = false;
-        device.$onEvent(event, entityId);
-        callService.callable = true;
+            const callService = CallService.instance;
+            callService.callable = false;
+            device.$onEvent(event, entityId);
+            callService.callable = true;
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     static get instance(): EventService {

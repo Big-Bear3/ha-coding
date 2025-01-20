@@ -26,40 +26,45 @@ export class HAWebsocketService {
         return new Promise<void>((resolve) => {
             this.#ws = new WebSocket(HA_WEBSOCKET_ADDRESS);
 
-            this.#ws.onopen = (): void => {
-                this.auth();
+            this.#ws.onopen = async (): Promise<void> => {
+                await this.auth();
 
                 this.subscribeEntities();
 
-                this.#ws.onmessage = (msg: WebSocket.MessageEvent) => {
-                    const msgData = JSON.parse(msg.data as string);
+                this.#ws.onmessage = async (msg: WebSocket.MessageEvent) => {
+                    try {
+                        const msgData = JSON.parse(msg.data as string);
 
-                    switch (msgData.type) {
-                        case 'auth_required':
-                            this.auth();
-                            break;
-                        case 'event':
-                            if (msgData.id !== this.#subscribeMsgId) return;
+                        switch (msgData.type) {
+                            case 'auth_required':
+                                await this.auth();
+                                this.subscribeEntities();
+                                break;
+                            case 'event':
+                                if (msgData.id !== this.#subscribeMsgId) return;
 
-                            if (msgData.event.a && !this.#haWebsocketReady) {
-                                for (const [entityId, event] of Object.entries<HAEvent>(msgData.event.a)) {
-                                    EventService.instance.handleEvent(entityId, event);
+                                if (msgData.event.a && !this.#haWebsocketReady) {
+                                    for (const [entityId, event] of Object.entries<HAEvent>(msgData.event.a)) {
+                                        EventService.instance.handleEvent(entityId, event);
+                                    }
+                                    this.#haWebsocketReady = true;
+                                    resolve();
+                                    return;
                                 }
-                                this.#haWebsocketReady = true;
-                                resolve();
-                                return;
-                            }
 
-                            if (!msgData.event.c || typeof msgData.event.c !== 'object') return;
+                                if (!msgData.event.c || typeof msgData.event.c !== 'object') return;
 
-                            const entityId = Object.keys(msgData.event.c)?.[0];
-                            if (!entityId) return;
+                                const entityId = Object.keys(msgData.event.c)?.[0];
+                                if (!entityId) return;
 
-                            const event: HAEvent = msgData.event.c[entityId]['+'];
+                                const event: HAEvent = msgData.event.c[entityId]['+'];
 
-                            EventService.instance.handleEvent(entityId, event);
+                                EventService.instance.handleEvent(entityId, event);
 
-                            break;
+                                break;
+                        }
+                    } catch (error) {
+                        console.error(error);
                     }
                 };
             };
@@ -74,7 +79,8 @@ export class HAWebsocketService {
         }
     }
 
-    private auth(): void {
+    private async auth(): Promise<void> {
+        await AppService.instance.refreshAccessToken();
         this.send({
             access_token: AppService.instance.haAccessToken,
             type: 'auth'

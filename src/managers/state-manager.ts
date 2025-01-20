@@ -53,8 +53,12 @@ export class StateManager {
                 const callService = CallService.instance;
 
                 if (callService.callable && callInfoGetter) {
-                    const callInfo = callInfoGetter(value);
-                    callService.push(callInfo);
+                    try {
+                        const callInfo = callInfoGetter(value);
+                        callService.push(callInfo);
+                    } catch (error) {
+                        console.error(error);
+                    }
                 }
 
                 effectManager.broadcast({ effect: { c, instance: this, state: key, stateType: 'state' }, value, oldValue });
@@ -119,11 +123,15 @@ export class StateManager {
                     effectManager.setEffects({ c, instance: this, state: stateInfo.name, stateType: 'action' });
 
                     const actionFn = (...args: unknown[]) => {
-                        const res = stateInfo.originalActionFn.bind(this)(...args);
-                        effectManager.broadcast({
-                            effect: { c, instance: this, state: stateInfo.name, stateType: 'action' },
-                            value: res
-                        });
+                        try {
+                            const res = stateInfo.originalActionFn.bind(this)(...args);
+                            effectManager.broadcast({
+                                effect: { c, instance: this, state: stateInfo.name, stateType: 'action' },
+                                value: res
+                            });
+                        } catch (error) {
+                            console.error(error);
+                        }
                     };
 
                     StateManager.instance.#actionFnToActionInfo.set(actionFn, {

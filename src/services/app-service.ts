@@ -23,13 +23,6 @@ export class AppService {
         this.#haAccessToken = tokenRes.access_token;
     }
 
-    timedRefreshAccessToken(): void {
-        setTimeout(async () => {
-            await this.refreshAccessToken();
-            this.timedRefreshAccessToken();
-        }, 29 * 60 * 1000);
-    }
-
     static get instance(): AppService {
         if (!AppService.#instance) AppService.#instance = new AppService();
         return AppService.#instance;
@@ -37,13 +30,9 @@ export class AppService {
 }
 
 export async function initHACoding(): Promise<void> {
-    const appService = AppService.instance;
-
     try {
-        await appService.refreshAccessToken();
         await HAWebsocketService.instance.createHAWebsocket();
-        appService.timedRefreshAccessToken();
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
