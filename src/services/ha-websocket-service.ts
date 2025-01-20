@@ -33,6 +33,7 @@ export class HAWebsocketService {
 
                 this.getConfig();
                 this.subscribeEntities();
+                this.timedPing();
 
                 this.#ws.onmessage = async (msg: WebSocket.MessageEvent) => {
                     try {
@@ -118,6 +119,17 @@ export class HAWebsocketService {
         };
 
         this.send(param);
+    }
+
+    private timedPing(): void {
+        setTimeout(() => {
+            const param = {
+                id: this.newMsgId,
+                type: 'ping'
+            };
+            this.send(param);
+            this.timedPing();
+        }, 29000);
     }
 
     static get instance(): HAWebsocketService {
