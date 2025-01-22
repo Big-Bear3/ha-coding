@@ -1,5 +1,5 @@
 ## 面向Home Assistant，使用TypeScript编写全平台自动化！更自由，更灵活！
-## 用法风格概览
+# 用法风格概览
 ```ts
 // 监听卫生间人在传感器有人无人变化
 onChange(
@@ -15,7 +15,7 @@ onChange(
     }
 );
 ```
-## 快速上手
+# 快速上手
 **前提：**
 1. 已经安装好 [Home Assistant](https://www.home-assistant.io/) 以及相关集成。
 2. 已经安装好 [Nodejs](https://nodejs.org/zh-cn) 环境。
@@ -49,8 +49,8 @@ export default {
 npm start
 ```
 等待几秒后控制台打印 “HA Coding 启动成功！”，则证明启动成功。如果控制台报错，则为启动失败。
-## 使用说明
-**定义设备：**
+# 使用说明
+## 定义设备：
 <br>定义设备是为了告知系统每个设备是如何与Home Assistant交互的，推荐在项目的devices-def文件夹下定义
 ```ts
 @Device()
@@ -111,7 +111,7 @@ export class MiLight implements DeviceDef {
 
 事件信息和发送信息可以在 Home Assistant 网页上使用 F12 查看 WebSocket 记录查询到。
 
-**创建设备实例：**
+## 创建设备实例：
 <br>在定义好设备后，我们需要创建这些设备的实例，以便在后续为这些设备编写自动化，推荐在项目的devices文件夹下创建
 ```ts
 export const bathroom = {
@@ -126,7 +126,7 @@ export const bathroom = {
 ```
 如上使用 createDevice() 方法定义了卫生间的一个米家智能灯设备和一个Trio人在传感器设备，createDevice() 方法的第一个参数为设备的定义类，第二个参数为该设备下的所有实体id。
 
-**编写自动化：**
+## 编写自动化：
 <br>在创建好设备后，我们就可以为这些设备编写自动化了，推荐在项目的automation文件夹下创建
 ```ts
 // 监听卫生间人在传感器区域1有人无人变化
@@ -145,8 +145,8 @@ onChange(
 ```
 如上使用onChange()方法，监听区域1有人无人状态，如果区域1有人则开灯，无人则关灯。更多的使用说明可以在下面的 API 中查询。
 
-## API
-**onChange()**
+# API
+## onChange()
 ```ts
 function onChange<T>(
     statesGetter: () => T,
@@ -170,7 +170,7 @@ onChange() 方法用于监听设备的状态变化，执行相关的逻辑。
 1. pause - 调用该方法以暂停监听
 2. resume - 调用该方法以恢复监听
 
-**onKeep()**
+## onKeep()
 ```ts
 function onKeep(
     statesJudger: () => boolean,
@@ -192,7 +192,7 @@ onKeep() 方法用于在设备状态维持了一段时间后，执行相关逻�
 - stop - 调用该方法以停止监听，并将维持时间清零
 - resume - 调用该方法以恢复监听
 
-**stage()**
+## stage()
 ```ts
 function stage<T extends [ReturnType<typeof step<any>>, ReturnType<typeof step<any>>, ...ReturnType<typeof step<any>>[]]>(
     ...steps: T
@@ -218,7 +218,7 @@ stage() 方法用于在事件或状态先后发生后，执行相关逻辑。
 - pause - 暂停当前阶段的监听。
 - resume - 恢复当前阶段的监听。
 
-**Timer**
+## Timer
 ```ts
 class Timer {
     constructor();
@@ -232,13 +232,15 @@ Timer类用于延时执行某段逻辑，需要实例化后使用。
 - timing() - 延时执行某段逻辑，再次调用会取消上一次的延时执行逻辑。 cb - 要执行逻辑的回调方法。 time - 延时的时间（单位：毫秒）。 返回值 - 取消延时执行这段逻辑。
 - cancel() - 取消延时执行某段逻辑。
 
-**delay()**
+## delay()
 ```ts
 function delay(cb: () => void, time: number): () => void;
 ```
 delay() 方法用于延时执行某段逻辑，与 Timer 不同的是，再次调用不会取消上一次的延时执行逻辑。
 
-参数
-- cb - 要执行逻辑的回调方法
-- time - 延时的时间（单位：毫秒）
+参数：
+- cb - 要执行逻辑的回调方法。
+- time - 延时的时间（单位：毫秒）。
+
+
 
