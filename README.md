@@ -124,5 +124,24 @@ export const bathroom = {
     })
 };
 ```
-如上使用 createDevice() 方法定义了卫生间的一个米家智能灯设备和一个Trio人在传感器设备，createDevice() 方法的第一个参数为设备的定义类，第二个参数为该设备下的实体id。
+如上使用 createDevice() 方法定义了卫生间的一个米家智能灯设备和一个Trio人在传感器设备，createDevice() 方法的第一个参数为设备的定义类，第二个参数为该设备下的所有实体id。
+
+**编写自动化：**
+<br>在创建好设备后，我们就可以为这些设备编写自动化了，推荐在项目的automation文件夹下创建
+```ts
+// 监听卫生间人在传感器区域1有人无人变化
+onChange(
+    () => bathroom.occupySensor.area1Occupied, // 区域1有人无人状态
+    (area1Occupied) => {
+        if (area1Occupied) {
+            // 如果有人则开灯
+            bathroom.lamp.on = true;
+        } else {
+            // 如果无人则关灯
+            bathroom.lamp.on = false;
+        }
+    }
+);
+```
+如上使用onChange()方法，编写了卫生间开关灯的自动化。监听区域1有人无人状态，如果区域1有人则开灯，无人则关灯。更多的使用方式可以在下面的 API 中查询。
 
