@@ -143,5 +143,28 @@ onChange(
     }
 );
 ```
-如上使用onChange()方法，编写了卫生间开关灯的自动化。监听区域1有人无人状态，如果区域1有人则开灯，无人则关灯。更多的使用方式可以在下面的 API 中查询。
+如上使用onChange()方法，监听区域1有人无人状态，如果区域1有人则开灯，无人则关灯。更多的使用说明可以在下面的 API 中查询。
 
+## API
+```ts
+function onChange<T>(
+    statesGetter: () => T,
+    cb: (states: CbStates<T>, oldStates: CbStates<T>) => void,
+    onChangeOptions?: {
+        immediate?: boolean;
+    }
+): {
+    pause: () => void;
+    resume: () => void;
+};
+```
+onChange() 方法用于监听设备的属性变化，执行相关的逻辑。
+
+参数：
+1. statesGetter  用于指定需要监听的设备属性，可以同时监听多个设备的多个属性。
+2. cb  属性变化后调用的回调方法。
+3. onChangeOptions  指定 onChange() 方法的监听选项，immediate - 是否在调用 onChange() 方法后，立即执行一次回调方法。
+
+返回值：
+1. pause  调用该方法以暂停监听
+2. resume  调用该方法以恢复监听
