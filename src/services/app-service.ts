@@ -33,6 +33,7 @@ export async function initHACoding(): Promise<void> {
     try {
         await import('../config/config.js');
         await HAWebsocketService.instance.createHAWebsocket();
+        console.log('HA Coding 启动成功！');
     } catch (error) {
         console.error(error);
     }
