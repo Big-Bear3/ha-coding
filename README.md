@@ -29,6 +29,7 @@ onChange(
 ```bash
 cd my-home
 npm install
+npm install ha-coding
 ```
 **配置项目：**
 用VS Code打开项目，打开根目录下的config.js文件，并配置成你的Home Assistant的相关配置
