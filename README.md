@@ -146,6 +146,7 @@ onChange(
 如上使用onChange()方法，监听区域1有人无人状态，如果区域1有人则开灯，无人则关灯。更多的使用说明可以在下面的 API 中查询。
 
 ## API
+**onChange()**
 ```ts
 function onChange<T>(
     statesGetter: () => T,
