@@ -34,7 +34,7 @@ npm install
 用VS Code打开项目，打开根目录下的config.js文件，并配置成你的Home Assistant的相关配置
 ```ts
 export default {
-    /** HomeAssistant后台地址 */
+    /** HomeAssistant后台ip地址:端口号，如：192.168.31.156:8123 */
     IP_ADDRESS_PORT: '',
     /** HomeAssistant用户名 */
     HA_USER_NAME: '',
