@@ -23,8 +23,6 @@ import {
 import { initHACoding } from './services/app-service.js';
 import { createDevice } from './actions/create-device.js';
 
-import('./app/app.js');
-
 export {
     Device,
     State,
