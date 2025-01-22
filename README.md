@@ -211,9 +211,24 @@ stage() 方法用于在事件或状态先后发生后，执行相关逻辑。
 - steps - 事件的阶段
 
 返回值：
-- next - 进入下一个阶段。 waitingTime - 下一个阶段等待的时长，超时则重置到第一个阶段。
-- prev - 进入上一个阶段。 waitingTime - 上一个阶段等待的时长，超时则重置到第一个阶段。
-- goto - 进入指定阶段。 waitingTime - 指定阶段等待的时长，超时则重置到第一个阶段。
+- next - 进入下一个阶段。 waitingTime - 下一个阶段等待的时长（单位：毫秒），超时则重置到第一个阶段。
+- prev - 进入上一个阶段。 waitingTime - 上一个阶段等待的时长（单位：毫秒），超时则重置到第一个阶段。
+- goto - 进入指定阶段。 waitingTime - 指定阶段等待的时长（单位：毫秒），超时则重置到第一个阶段。
 - reset - 重置到第一个阶段。
 - pause - 暂停当前阶段的监听。
 - resume - 恢复当前阶段的监听。
+
+**Timer**
+```ts
+export class Timer {
+    constructor();
+    timing: (cb: () => void, time: number) => () => void;
+    cancel: () => void;
+}
+```
+Timer类用于延时执行某段逻辑，需要实例化后使用。
+
+方法: 
+- timing() - 延时执行某段逻辑，再次调用会取消上一次的延时执行逻辑。 cb - 要执行的逻辑回调方法。 time - 延时的时间（单位：毫秒）
+- cancel() - 取消延时执行某段逻辑。
+
