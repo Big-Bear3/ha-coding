@@ -159,13 +159,30 @@ function onChange<T>(
     resume: () => void;
 };
 ```
-onChange() 方法用于监听设备的属性变化，执行相关的逻辑。
+onChange() 方法用于监听设备的状态变化，执行相关的逻辑。
 
 参数：
-1. statesGetter  用于指定需要监听的设备属性，可以同时监听多个设备的多个属性。
-2. cb  属性变化后调用的回调方法。
-3. onChangeOptions  指定 onChange() 方法的监听选项，immediate - 是否在调用 onChange() 方法后，立即执行一次回调方法。
+1. statesGetter - 用于指定需要监听的设备状态，可以同时监听多个设备的多个状态。
+2. cb - 状态变化后调用的回调方法。
+3. onChangeOptions - 指定 onChange() 方法的监听选项，immediate - 是否在调用 onChange() 方法后，立即执行一次回调方法。
 
 返回值：
-1. pause  调用该方法以暂停监听
-2. resume  调用该方法以恢复监听
+1. pause - 调用该方法以暂停监听
+2. resume - 调用该方法以恢复监听
+
+**onKeep()**
+```ts
+export function onKeep(
+    statesJudger: () => boolean,
+    cb: () => void,
+    keepTime?: number
+): {
+    stop: () => void;
+    resume: () => void;
+};
+```
+onKeep() 方法用于在设备状态维持了一段时间后，执行相关逻辑。
+参数：
+1. statesJudger - 状态是否符合预期。
+2. cb - 状态符合预期并维持了指定时长后的回调方法。
+3. keepTime - 指定设备状态维持的时长
