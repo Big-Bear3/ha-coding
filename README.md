@@ -50,7 +50,7 @@ npm start
 ```
 等待几秒后控制台打印 “HA Coding 启动成功！”，则证明启动成功。如果控制台报错，则为启动失败。
 # 使用说明
-## 定义设备：
+## 定义设备
 <br>定义设备是为了告知系统每个设备是如何与Home Assistant交互的，推荐在项目的devices-def文件夹下定义
 ```ts
 @Device()
@@ -111,7 +111,7 @@ export class MiLight implements DeviceDef {
 
 事件信息和发送信息可以在 Home Assistant 网页上使用 F12 查看 WebSocket 记录查询到。
 
-## 创建设备实例：
+## 创建设备实例
 <br>在定义好设备后，我们需要创建这些设备的实例，以便在后续为这些设备编写自动化，推荐在项目的devices文件夹下创建
 ```ts
 export const bathroom = {
@@ -126,7 +126,7 @@ export const bathroom = {
 ```
 如上使用 createDevice() 方法定义了卫生间的一个米家智能灯设备和一个Trio人在传感器设备，createDevice() 方法的第一个参数为设备的定义类，第二个参数为该设备下的所有实体id。
 
-## 编写自动化：
+## 编写自动化
 <br>在创建好设备后，我们就可以为这些设备编写自动化了，推荐在项目的automation文件夹下创建
 ```ts
 // 监听卫生间人在传感器区域1有人无人变化
@@ -242,5 +242,27 @@ delay() 方法用于延时执行某段逻辑，与 Timer 不同的是，再次�
 - cb - 要执行逻辑的回调方法。
 - time - 延时的时间（单位：毫秒）。
 
+## schedule()
+```ts
+function schedule(
+    time: TimeStr | number | ((date: DateStr, week: number) => TimeStr | number),
+    cb: () => void,
+    repeatType: RepeatType
+);
+```
+delay() 方法用于定时执行某段逻辑。
 
-
+参数：
+- time - 定时的时间。分两种，一种字符串，如："16:21:00"，一种是距当天0点的毫秒数，也可以通过回调方法返回这两种，回调方法参数 date - 当天的日期，week - 当天是周几（0是周日，1是周一，2是周二 ...以此类推）。
+- cb - 到设定的定时时间的回调方法。
+- repeatType - 重复类型，可选的值如下：
+```ts
+export type RepeatType =
+    | 'EVERY_DAY'  // 每天（默认）
+    | 'WEEK_DAY' // 周一到周五
+    | 'WEEKEND' // 周六日
+    | 'WORK_DAY' // 工作日（算上调休日）
+    | 'NON_WORK_DAY' // 周六日和法定节假日
+    | WEEK[] // 指定星期几
+    | ((date: DateStr, week: number) => boolean);
+```
