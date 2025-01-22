@@ -264,5 +264,5 @@ export type RepeatType =
     | 'WORK_DAY' // 工作日（算上调休日）
     | 'NON_WORK_DAY' // 周六日和法定节假日
     | WEEK[] // 指定星期几
-    | ((date: DateStr, week: number) => boolean);
+    | ((date: DateStr, week: number) => boolean); // 返回值为真则当日执行，为假当日不执行。 date - 当天的日期，week - 当天是周几（0是周日，1是周一，2是周二 ...以此类推）。
 ```
