@@ -307,3 +307,20 @@ createDevice<T extends Class<DeviceDef>>(
 ): InstanceType<T>;
 ```
 createDevice() 方法用于创建设备的实例。具体用法可以参考[创建设备实例章节](#createDevice)。
+
+## 其他
+```ts
+export function cloneDeep<T>(value: T): T;
+export function isEqual(value: any, other: any): boolean;
+
+export function isWeekDay(date?: DateStr): boolean;
+export function isWeekend(date?: DateStr): boolean;
+export function isWorkDay(date?: DateStr): boolean;
+export function isNotWorkDay(date?: DateStr): boolean;
+
+export function getSunInfo(date?: DateStr): SunInfo;
+export function getSunriseTime(date?: DateStr): TimeStr;
+export function getSunsetTime(date?: DateStr): TimeStr;
+
+export function inTimeRange(startTime: TimeStr, endTime: TimeStr): boolean;
+```
