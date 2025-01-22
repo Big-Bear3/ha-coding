@@ -266,3 +266,14 @@ export type RepeatType =
     | WEEK[] // 指定星期几
     | ((date: DateStr, week: number) => boolean); // 返回值为真则当日执行，为假当日不执行。 date - 当天的日期，week - 当天是周几（0是周日，1是周一，2是周二 ...以此类推）。
 ```
+## ref()
+```ts
+function ref<T>(value?: T): Ref<T>;
+```
+schedule() 方法用于创建响应式变量，与被State()装饰器装饰的变量一样，可以被 onChange()、onKeep() 等方法监听。
+
+参数：
+- value - 变量的初始值。
+
+返回值：
+创建的响应式变量
