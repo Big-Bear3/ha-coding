@@ -4,6 +4,7 @@ import type { HAEvent } from '../types/ha-types';
 import { GEOGRAPHIC_LOCATION, HA_WEBSOCKET_ADDRESS } from '../config/config.js';
 import { AppService } from './app-service.js';
 import { EventService } from './event-service.js';
+import { customSubscribers } from 'src/actions/custom-subscribe';
 
 export class HAWebsocketService {
     static #instance: HAWebsocketService;
@@ -38,6 +39,15 @@ export class HAWebsocketService {
                 this.#ws.onmessage = async (msg: WebSocket.MessageEvent) => {
                     try {
                         const msgData = JSON.parse(msg.data as string);
+
+                        for (const [customSubscribeId, customSubscriber] of customSubscribers) {
+                            try {
+                                const res = customSubscriber(msgData);
+                                if (res === false) return;
+                            } catch (error) {
+                                console.error(error);
+                            }
+                        }
 
                         switch (msgData.type) {
                             case 'auth_required':
