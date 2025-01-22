@@ -172,7 +172,7 @@ onChange() 方法用于监听设备的状态变化，执行相关的逻辑。
 
 **onKeep()**
 ```ts
-export function onKeep(
+function onKeep(
     statesJudger: () => boolean,
     cb: () => void,
     keepTime?: number
@@ -194,7 +194,7 @@ onKeep() 方法用于在设备状态维持了一段时间后，执行相关逻�
 
 **stage()**
 ```ts
-stage<T extends [ReturnType<typeof step<any>>, ReturnType<typeof step<any>>, ...ReturnType<typeof step<any>>[]]>(
+function stage<T extends [ReturnType<typeof step<any>>, ReturnType<typeof step<any>>, ...ReturnType<typeof step<any>>[]]>(
     ...steps: T
 ): {
     next: (waitingTime?: number) => void;
@@ -220,7 +220,7 @@ stage() 方法用于在事件或状态先后发生后，执行相关逻辑。
 
 **Timer**
 ```ts
-export class Timer {
+class Timer {
     constructor();
     timing: (cb: () => void, time: number) => () => void;
     cancel: () => void;
@@ -231,4 +231,9 @@ Timer类用于延时执行某段逻辑，需要实例化后使用。
 方法: 
 - timing() - 延时执行某段逻辑，再次调用会取消上一次的延时执行逻辑。 cb - 要执行的逻辑回调方法。 time - 延时的时间（单位：毫秒）
 - cancel() - 取消延时执行某段逻辑。
+
+**delay()**
+```ts
+function delay(cb: () => void, time: number): () => void;
+```
 
