@@ -186,3 +186,22 @@ onKeep() 方法用于在设备状态维持了一段时间后，执行相关逻�
 1. statesJudger - 状态是否符合预期。
 2. cb - 状态符合预期并维持了指定时长后的回调方法。
 3. keepTime - 指定设备状态维持的时长
+
+返回值：
+1. stop - 调用该方法以停止监听，并将维持时间清零
+2. resume - 调用该方法以恢复监听
+
+**stage()**
+```ts
+stage<T extends [ReturnType<typeof step<any>>, ReturnType<typeof step<any>>, ...ReturnType<typeof step<any>>[]]>(
+    ...steps: T
+): {
+    next: (waitingTime?: number) => void;
+    prev: (waitingTime?: number) => void;
+    goto: (stepIndex: ArrayIndexes<T>) => void;
+    reset: () => void;
+    pause: () => void;
+    resume: () => void;
+}
+```
+stage() 方法用于在事件或状态先后发生后，执行相关逻辑。
