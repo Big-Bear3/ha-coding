@@ -310,17 +310,33 @@ createDevice() 方法用于创建设备的实例。具体用法可以参考[创�
 
 ## 其他
 ```ts
+/** 深拷贝一个对象 */
 export function cloneDeep<T>(value: T): T;
+
+/** 判断两个对象中的属性是否全部相等 */
 export function isEqual(value: any, other: any): boolean;
 
+/** 判断是否是周一到周五 */
 export function isWeekDay(date?: DateStr): boolean;
+
+/** 判断是否是周六日 */
 export function isWeekend(date?: DateStr): boolean;
+
+/** 判断是否是工作日（算上调休日） */
 export function isWorkDay(date?: DateStr): boolean;
+
+/** 判断是否是周六日或法定节假日 */
 export function isNotWorkDay(date?: DateStr): boolean;
 
+/** 获取太阳相关信息 */
 export function getSunInfo(date?: DateStr): SunInfo;
+
+/** 获取日出时间 */
 export function getSunriseTime(date?: DateStr): TimeStr;
+
+/** 获取日落时间 */
 export function getSunsetTime(date?: DateStr): TimeStr;
 
+/** 判断是否在某一时间范围内 */
 export function inTimeRange(startTime: TimeStr, endTime: TimeStr): boolean;
 ```
