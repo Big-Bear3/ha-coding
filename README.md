@@ -50,8 +50,8 @@ npm start
 ```
 等待几秒后控制台打印 “HA Coding 启动成功！”，则证明启动成功。如果控制台报错，则为启动失败。
 ## 使用说明
-**定义设备**
-定义设备是为了告知系统每个设备是如何与Home Assistant交互的。
+**定义设备：**
+<br>定义设备是为了告知系统每个设备是如何与Home Assistant交互的，推荐在项目的devices-def文件夹下定义
 ```ts
 @Device()
 export class MiLight implements DeviceDef {
@@ -108,4 +108,21 @@ export class MiLight implements DeviceDef {
 2. 创建 $entityIds 成员变量，用于存放该设备下的实体id。
 3. 定义设备的属性 on（开关状态）、brightness（亮度）、colorTemperature（色温），并使用 @State() 装饰器装饰。@State() 装饰器中的参数回调方法需返回发送信息来告知系统当该属性发生变化时，如何发送到Home Assistant上。
 4. 定义 $onEvent 方法，当 Home Assistant 产生事件时会调用该方法，将事件信息映射到设备的属性上。
+
 事件信息和发送信息可以在 Home Assistant 网页上使用 F12 查看 WebSocket 记录查询到。
+
+**创建设备实例：**
+<br>在定义好设备后，我们需要创建这些设备的实例，以便在后续为这些设备编写自动化，推荐在项目的devices文件夹下创建
+```ts
+export const bathroom = {
+    lamp: createDevice(MiLight, { light: 'your entity id' }),
+    occupySensor: createDevice(MiTrio, {
+        allArea: 'your entity id',
+        illumination: 'your entity id',
+        area1: 'your entity id',
+        area2: 'your entity id'
+    })
+};
+```
+如上使用 createDevice() 方法定义了卫生间的一个米家智能灯设备和一个Trio人在传感器设备，createDevice() 方法的第一个参数为设备的定义类，第二个参数为该设备下的实体id。
+
