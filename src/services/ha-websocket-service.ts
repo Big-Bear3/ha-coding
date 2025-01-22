@@ -14,7 +14,7 @@ export class HAWebsocketService {
 
     #getConfigId: number;
 
-    #subscribeMsgId: number;
+    #subscribeEntitiesMsgId: number;
 
     #haWebsocketReady = false;
 
@@ -46,7 +46,7 @@ export class HAWebsocketService {
                                 break;
 
                             case 'event':
-                                if (msgData.id !== this.#subscribeMsgId) return;
+                                if (msgData.id !== this.#subscribeEntitiesMsgId) return;
 
                                 if (msgData.event.a && !this.#haWebsocketReady) {
                                     for (const [entityId, event] of Object.entries<HAEvent>(msgData.event.a)) {
@@ -117,10 +117,10 @@ export class HAWebsocketService {
     }
 
     private subscribeEntities(): void {
-        this.#subscribeMsgId = this.newMsgId;
+        this.#subscribeEntitiesMsgId = this.newMsgId;
 
         const param = {
-            id: this.#subscribeMsgId,
+            id: this.#subscribeEntitiesMsgId,
             type: 'subscribe_entities'
         };
 
