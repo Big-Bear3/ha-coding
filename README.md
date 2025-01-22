@@ -32,7 +32,7 @@ npm install
 npm install ha-coding
 ```
 **配置项目：**
-用VS Code打开项目，打开根目录下的config.js文件，并配置成你的Home Assistant的相关配置
+用VS Code打开项目，打开根目录下的 config.js 文件，并配置成你的 Home Assistant 的相关配置
 ```ts
 export default {
     /** HomeAssistant后台ip地址:端口号，如：192.168.31.156:8123 */
@@ -51,7 +51,7 @@ npm start
 等待几秒后控制台打印 “HA Coding 启动成功！”，则证明启动成功。如果控制台报错，则为启动失败。
 # 使用说明
 ## 定义设备
-<br>定义设备是为了告知系统每个设备是如何与Home Assistant交互的，推荐在项目的devices-def文件夹下定义
+<br>定义设备是为了告知系统每个设备是如何与 Home Assistant 交互的，推荐在项目的 devices-def 文件夹下定义
 ```ts
 @Device()
 export class MiLight implements DeviceDef {
@@ -105,8 +105,8 @@ export class MiLight implements DeviceDef {
 ```
 如上定义了一个米家智能灯设备：
 1. 创建一个 MiLight 类并实现 DeviceDef 接口，并使用 @Device() 装饰器装饰 MiLight 类。
-2. 创建 $entityIds 成员变量，用于存放该设备下的实体id。
-3. 定义设备的属性 on（开关状态）、brightness（亮度）、colorTemperature（色温），并使用 @State() 装饰器装饰。@State() 装饰器中的参数回调方法需返回发送信息来告知系统当该属性发生变化时，如何发送到Home Assistant上。
+2. 创建 $entityIds 成员变量，用于存放该设备下的所有实体id。
+3. 定义设备的属性 on（开关状态）、brightness（亮度）、colorTemperature（色温），并使用 @State() 装饰器装饰。@State() 装饰器中的参数回调方法返回发送信息来告知系统当该属性发生变化时，如何发送到Home Assistant上。
 4. 定义 $onEvent 方法，当 Home Assistant 产生事件时会调用该方法，将事件信息映射到设备的属性上。
 
 事件信息和发送信息可以在 Home Assistant 网页上使用 F12 查看 WebSocket 记录查询到。
