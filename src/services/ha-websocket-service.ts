@@ -1,9 +1,9 @@
-import type { ObjectType } from '../types/types';
 import WebSocket from 'ws';
+import type { ObjectType } from '../types/types';
+import type { HAEvent } from '../types/ha-types';
 import { GEOGRAPHIC_LOCATION, HA_WEBSOCKET_ADDRESS } from '../config/config.js';
 import { AppService } from './app-service.js';
 import { EventService } from './event-service.js';
-import { HAEvent } from '../types/ha-types';
 
 export class HAWebsocketService {
     static #instance: HAWebsocketService;
@@ -70,9 +70,15 @@ export class HAWebsocketService {
 
                             case 'result':
                                 if (msgData.id === this.#getConfigId) {
-                                    GEOGRAPHIC_LOCATION[0] = msgData.result.latitude;
-                                    GEOGRAPHIC_LOCATION[1] = msgData.result.longitude;
-                                    GEOGRAPHIC_LOCATION[2] = msgData.result.elevation;
+                                    if (msgData.result?.latitude !== undefined && msgData.result?.latitude !== null) {
+                                        GEOGRAPHIC_LOCATION[0] = msgData.result.latitude;
+                                    }
+                                    if (msgData.result?.longitude !== undefined && msgData.result?.longitude !== null) {
+                                        GEOGRAPHIC_LOCATION[1] = msgData.result.longitude;
+                                    }
+                                    if (msgData.result?.elevation !== undefined && msgData.result?.elevation !== null) {
+                                        GEOGRAPHIC_LOCATION[2] = msgData.result.elevation;
+                                    }
                                 }
                         }
                     } catch (error) {

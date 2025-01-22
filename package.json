@@ -8,6 +8,7 @@
         "src",
         "index.js",
         "index.d.ts",
+        "config.js",
         "LICENSE",
         "README.md"
     ],

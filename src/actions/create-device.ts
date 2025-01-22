@@ -1,5 +1,5 @@
+import type { Class, DeviceDef } from '../types/types';
 import { DeviceManager } from '../managers/device-manager.js';
-import { Class, DeviceDef } from '../types/types';
 
 export type Device<T = {}> = DeviceDef & T;
 

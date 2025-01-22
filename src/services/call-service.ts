@@ -1,5 +1,5 @@
 import { nextTick } from 'process';
-import { HACallData } from 'src/types/ha-types';
+import type { HACallData } from '../types/ha-types';
 import { HAWebsocketService } from './ha-websocket-service.js';
 import { IMMEDIATE_CALL } from '../config/config.js';
 

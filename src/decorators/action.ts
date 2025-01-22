@@ -1,5 +1,5 @@
-import { isStaticMember } from '../utils/object-utils.js';
 import type { Class, MethodDescriptor } from '../types/types';
+import { isStaticMember } from '../utils/object-utils.js';
 import { StateManager } from '../managers/state-manager.js';
 
 export function Action() {

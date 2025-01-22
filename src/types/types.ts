@@ -1,4 +1,4 @@
-import { HAEvent } from './ha-types';
+import type { HAEvent } from './ha-types';
 
 export type Class<T = any> = new (...args: any[]) => T;
 

@@ -1,5 +1,5 @@
+import type { HAEvent } from '../types/ha-types';
 import { DeviceManager } from '../managers/device-manager.js';
-import { HAEvent } from '../types/ha-types';
 import { CallService } from './call-service.js';
 
 export class EventService {

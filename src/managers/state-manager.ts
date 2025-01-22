@@ -1,8 +1,8 @@
-import { CallInfoGetter, CallService } from '../services/call-service.js';
 import type { Ref } from '../objects/ref';
 import type { Class, MethodDescriptor, ObjectKey, ObjectType } from '../types/types';
-import { EffectManager } from './effect-manager.js';
 import { cloneDeep, isEqual } from 'lodash-es';
+import { CallInfoGetter, CallService } from '../services/call-service.js';
+import { EffectManager } from './effect-manager.js';
 
 interface StateInfo {
     name: ObjectKey;
