@@ -49,3 +49,63 @@ export default {
 npm start
 ```
 等待几秒后控制台打印 “HA Coding 启动成功！”，则证明启动成功。如果控制台报错，则为启动失败。
+## 使用说明
+**定义设备**
+定义设备是为了告知系统每个设备是如何与Home Assistant交互的。
+```ts
+@Device()
+export class MiLight implements DeviceDef {
+    $entityIds: { light: string };
+
+    @State(function (this: MiLight, value: MiLight['on']) {
+        return { service: value ? 'turn_on' : 'turn_off', entityId: this.$entityIds.light };
+    })
+    on: boolean;
+
+    @State(function (this: MiLight, value: MiLight['brightness']) {
+        return {
+            service: 'turn_on',
+            serviceData: {
+                brightness_pct: value
+            },
+            entityId: this.$entityIds.light
+        };
+    })
+    brightness: number;
+
+    @State(function (this: MiLight, value: MiLight['colorTemperature']) {
+        return {
+            service: 'turn_on',
+            serviceData: {
+                color_temp_kelvin: value
+            },
+            entityId: this.$entityIds.light
+        };
+    })
+    colorTemperature: number;
+
+    $onEvent({ a, s }: MiLightEvent, entityId: string): void {
+        if (entityId !== this.$entityIds.light) return;
+
+        if (s === 'on') {
+            this.on = true;
+        } else if (s === 'off') {
+            this.on = false;
+        }
+
+        if (a.brightness !== undefined && a.brightness !== null) {
+            this.brightness = Math.round((a.brightness * 100) / 255);
+        }
+
+        if (a.color_temp_kelvin !== undefined && a.color_temp_kelvin !== null) {
+            this.colorTemperature = a.color_temp_kelvin;
+        }
+    }
+}
+```
+如上定义了一个米家智能灯设备：
+1. 创建一个 MiLight 类并实现 DeviceDef 接口，并使用 @Device() 装饰器装饰 MiLight 类。
+2. 创建 $entityIds 成员变量，用于存放该设备下的实体id。
+3. 定义设备的属性 on（开关状态）、brightness（亮度）、colorTemperature（色温），并使用 @State() 装饰器装饰。@State() 装饰器中的参数回调方法需返回发送信息来告知系统当该属性发生变化时，如何发送到Home Assistant上。
+4. 定义 $onEvent 方法，当 Home Assistant 产生事件时会调用该方法，将事件信息映射到设备的属性上。
+事件信息和发送信息可以在 Home Assistant 网页上使用 F12 查看 WebSocket 记录查询到。
