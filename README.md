@@ -162,9 +162,9 @@ function onChange<T>(
 onChange() 方法用于监听设备的状态变化，执行相关的逻辑。
 
 参数：
-1. statesGetter - 用于指定需要监听的设备状态，可以同时监听多个设备的多个状态。
-2. cb - 状态变化后调用的回调方法。
-3. onChangeOptions - 指定 onChange() 方法的监听选项，immediate - 是否在调用 onChange() 方法后，立即执行一次回调方法。
+- statesGetter - 用于指定需要监听的设备状态，可以同时监听多个设备的多个状态。
+- cb - 状态变化后调用的回调方法。
+- onChangeOptions - 指定 onChange() 方法的监听选项，immediate - 是否在调用 onChange() 方法后，立即执行一次回调方法。
 
 返回值：
 1. pause - 调用该方法以暂停监听
@@ -182,14 +182,15 @@ export function onKeep(
 };
 ```
 onKeep() 方法用于在设备状态维持了一段时间后，执行相关逻辑。
+
 参数：
-1. statesJudger - 状态是否符合预期。
-2. cb - 状态符合预期并维持了指定时长后的回调方法。
-3. keepTime - 指定设备状态维持的时长
+- statesJudger - 状态是否符合预期。
+- cb - 状态符合预期并维持了指定时长后的回调方法。
+- keepTime - 指定设备状态维持的时长
 
 返回值：
-1. stop - 调用该方法以停止监听，并将维持时间清零
-2. resume - 调用该方法以恢复监听
+- stop - 调用该方法以停止监听，并将维持时间清零
+- resume - 调用该方法以恢复监听
 
 **stage()**
 ```ts
@@ -205,3 +206,14 @@ stage<T extends [ReturnType<typeof step<any>>, ReturnType<typeof step<any>>, ...
 }
 ```
 stage() 方法用于在事件或状态先后发生后，执行相关逻辑。
+
+参数：
+- steps - 事件的阶段
+
+返回值：
+- next - 进入下一个阶段。 waitingTime - 下一个阶段等待的时长，超时则重置到第一个阶段。
+- prev - 进入上一个阶段。 waitingTime - 上一个阶段等待的时长，超时则重置到第一个阶段。
+- goto - 进入指定阶段。 waitingTime - 指定阶段等待的时长，超时则重置到第一个阶段。
+- reset - 重置到第一个阶段。
+- pause - 暂停当前阶段的监听。
+- resume - 恢复当前阶段的监听。
