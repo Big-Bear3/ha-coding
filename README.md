@@ -111,6 +111,7 @@ export class MiLight implements DeviceDef {
 
 事件信息和发送信息可以在 Home Assistant 网页上使用 F12 查看 WebSocket 记录查询到。
 
+<a id="createDevice"></a>
 ## 创建设备实例
 <br>在定义好设备后，我们需要创建这些设备的实例，以便在后续为这些设备编写自动化，推荐在项目的devices文件夹下创建
 ```ts
@@ -267,16 +268,24 @@ export type RepeatType =
     | ((date: DateStr, week: number) => boolean); // 返回值为真则当日执行，为假当日不执行。 date - 当天的日期，week - 当天是周几（0是周日，1是周一，2是周二 ...以此类推）。
 ```
 
+## @Device()
+```ts
+function Device(): ClassDecorator;
+```
+@Device() 装饰器用于装饰设备定义类，设备定义类被其装饰才会有本篇说明的一系列效果。
+
 ## @State()
 ```ts
 function State(callInfoGetter?: CallInfoGetter): PropertyDecorator;
 ```
 @State() 装饰器装饰的变量会变为响应式变量，可以被 onChange()、onKeep() 等方法监听。
 
-参数：
-- callInfoGetter - 当变量变化后会调用该方法获取要发送到 Home Assistant 的数据。
+## @Action()
+```ts
+function Action(): MethodDecorator;
+```
+@Action() 装饰器用于装饰设备的无状态事件（如：无线开关的单击事件）的方法，该方法被调用时，可以被 onChange()、onKeep() 等方法监听到。
 
- 
 ## ref()
 ```ts
 function ref<T>(value?: T): Ref<T>;
@@ -288,3 +297,13 @@ schedule() 方法用于创建响应式变量，与被State()装饰器装饰的�
 
 返回值：
 创建的响应式变量。
+
+## createDevice()
+```ts
+createDevice<T extends Class<DeviceDef>>(
+    deviceDef: T,
+    entityIds: InstanceType<T>['$entityIds'],
+    ...cps: ConstructorParameters<T>
+): InstanceType<T>;
+```
+createDevice() 方法用于创建设备的实例。具体用法可以参考[创建设备实例章节](#createDevice)。
