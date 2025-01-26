@@ -7,6 +7,7 @@ export interface CallInfo {
     entityId: string;
     service: string;
     serviceData?: Record<string, any>;
+    mergable?: boolean;
 }
 
 export type CallInfoGetter = (value: any) => CallInfo;
@@ -49,7 +50,9 @@ export class CallService {
     call(): void {
         try {
             const haWebsocketService = HAWebsocketService.instance;
-            for (const callInfo of this.#callingQueue) {
+            const callDataMap = new Map<string | number, HACallData>();
+            while (this.#callingQueue.length > 0) {
+                const callInfo = this.#callingQueue.shift();
                 const callData: HACallData = {
                     id: haWebsocketService.newMsgId,
                     domain: this.getDomain(callInfo.entityId),
@@ -61,9 +64,22 @@ export class CallService {
                     },
                     type: 'call_service'
                 };
+                if (callInfo.mergable) {
+                    const targetCallData = callDataMap.get(callInfo.entityId + '##' + callInfo.service);
+                    if (targetCallData) {
+                        targetCallData.service_data = { ...targetCallData.service_data, ...callInfo.serviceData };
+                    } else {
+                        callDataMap.set(callInfo.entityId + '##' + callInfo.service, callData);
+                    }
+                } else {
+                    callDataMap.set(callData.id, callData);
+                }
+            }
+
+            for (const [callDataKey, callData] of callDataMap) {
                 haWebsocketService.send(callData);
             }
-            this.#callingQueue.splice(0);
+
             this.#callingIsActivated = false;
         } catch (error) {
             console.error(error);
