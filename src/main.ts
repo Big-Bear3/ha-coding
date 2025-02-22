@@ -23,6 +23,7 @@ import {
 import { initHACoding } from './services/app-service.js';
 import { createDevice } from './actions/create-device.js';
 import { CallInfo, CallService } from './services/call-service.js';
+import { sendNotification } from './actions/send-notification.js';
 
 const call = (callInfo: CallInfo) => CallService.instance.push(callInfo);
 
@@ -50,5 +51,6 @@ export {
     inTimeRange,
     initHACoding,
     createDevice,
-    call
+    call,
+    sendNotification
 };

@@ -83,6 +83,11 @@ export interface CallInfo {
 
 export type CallInfoGetter = (value: any) => CallInfo;
 
+export interface NotificationInfo {
+    entityId: string;
+    content: string;
+}
+
 export function Device(): ClassDecorator;
 
 export function State(callInfoGetter?: CallInfoGetter): PropertyDecorator;
@@ -161,3 +166,5 @@ export function createDevice<T extends Class<DeviceDef>>(
 ): InstanceType<T>;
 
 export function call(callInfo: CallInfo): void;
+
+export function sendNotification(notificationInfo: NotificationInfo): void;
