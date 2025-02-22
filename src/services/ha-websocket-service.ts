@@ -4,7 +4,7 @@ import type { HAEvent } from '../types/ha-types';
 import { GEOGRAPHIC_LOCATION, HA_WEBSOCKET_ADDRESS } from '../config/config.js';
 import { AppService } from './app-service.js';
 import { EventService } from './event-service.js';
-import { customSubscribers } from 'src/actions/custom-subscribe';
+import { customSubscribers } from '../actions/custom-subscribe.js';
 
 export class HAWebsocketService {
     static #instance: HAWebsocketService;

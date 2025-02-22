@@ -22,6 +22,9 @@ import {
 } from './utils/app-utils.js';
 import { initHACoding } from './services/app-service.js';
 import { createDevice } from './actions/create-device.js';
+import { CallInfo, CallService } from './services/call-service.js';
+
+const call = (callInfo: CallInfo) => CallService.instance.push(callInfo);
 
 export {
     Device,
@@ -46,5 +49,6 @@ export {
     getSunsetTime,
     inTimeRange,
     initHACoding,
-    createDevice
+    createDevice,
+    call
 };

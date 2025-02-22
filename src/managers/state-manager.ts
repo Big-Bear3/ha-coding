@@ -46,20 +46,20 @@ export class StateManager {
             set(value: unknown) {
                 const oldValue = this[key];
 
-                if (isEqual(value, oldValue)) return;
-
                 StateManager.instance.setStateValue(this, key, value);
 
                 const callService = CallService.instance;
 
                 if (callService.callable && callInfoGetter) {
                     try {
-                        const callInfo = callInfoGetter(value);
+                        const callInfo = callInfoGetter.bind(this)(value);
                         callService.push(callInfo);
                     } catch (error) {
                         console.error(error);
                     }
                 }
+
+                if (isEqual(value, oldValue)) return;
 
                 effectManager.broadcast({ effect: { c, instance: this, state: key, stateType: 'state' }, value, oldValue });
             }

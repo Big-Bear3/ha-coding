@@ -159,3 +159,5 @@ export function createDevice<T extends Class<DeviceDef>>(
     entityIds: InstanceType<T>['$entityIds'],
     ...cps: ConstructorParameters<T>
 ): InstanceType<T>;
+
+export function call(callInfo: CallInfo): void;
