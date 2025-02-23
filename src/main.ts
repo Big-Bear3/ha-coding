@@ -24,8 +24,12 @@ import { initHACoding } from './services/app-service.js';
 import { createDevice } from './actions/create-device.js';
 import { CallInfo, CallService } from './services/call-service.js';
 import { sendNotification } from './actions/send-notification.js';
+import { HAWebsocketService } from './services/ha-websocket-service.js';
+import type { ObjectType } from './types/types';
 
 const call = (callInfo: CallInfo) => CallService.instance.push(callInfo);
+
+const sendMsg = (msg: string | ObjectType) => HAWebsocketService.instance.send(msg);
 
 export {
     Device,
@@ -52,5 +56,6 @@ export {
     initHACoding,
     createDevice,
     call,
-    sendNotification
+    sendNotification,
+    sendMsg
 };

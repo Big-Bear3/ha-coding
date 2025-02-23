@@ -168,3 +168,5 @@ export function createDevice<T extends Class<DeviceDef>>(
 export function call(callInfo: CallInfo): void;
 
 export function sendNotification(notificationInfo: NotificationInfo): void;
+
+export function sendMsg(msg: string | ObjectType): void;
