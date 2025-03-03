@@ -308,6 +308,36 @@ createDevice<T extends Class<DeviceDef>>(
 ```
 createDevice() 方法用于创建设备的实例。具体用法可以参考[创建设备实例章节](#createDevice)。
 
+## call()
+```ts
+call(callInfo: CallInfo): void;
+```
+call() 方法用于下发要对某一设备执行的操作。
+
+## sendNotification()
+```ts
+sendNotification(notificationInfo: NotificationInfo): void;
+```
+sendNotification() 方法用于为某一设备实体发送通知。
+
+## customSubscribe()
+```ts
+customSubscribe(cb: (msgData: ObjectType) => boolean): number
+```
+customSubscribe() 方法用于自定义订阅Home assistant Websocket返回的消息。
+
+## removeCustomSubscribe()
+```ts
+removeCustomSubscribe(customSubscribeId: number): void;
+```
+removeCustomSubscribe() 方法用于移除自定义订阅。
+
+## sendMsg()
+```ts
+sendMsg(msg: string | ObjectType): void;
+```
+sendMsg() 方法用于向Home assistant Websocket发送自定义消息。
+
 ## 其他
 ```ts
 /** 深拷贝一个对象 */
