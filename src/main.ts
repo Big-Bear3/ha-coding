@@ -25,6 +25,7 @@ import { createDevice } from './actions/create-device.js';
 import { CallInfo, CallService } from './services/call-service.js';
 import { sendNotification } from './actions/send-notification.js';
 import { HAWebsocketService } from './services/ha-websocket-service.js';
+import { customSubscribe, removeCustomSubscribe } from './actions/custom-subscribe.js';
 import type { ObjectType } from './types/types';
 
 const call = (callInfo: CallInfo) => CallService.instance.push(callInfo);
@@ -57,5 +58,7 @@ export {
     createDevice,
     call,
     sendNotification,
+    customSubscribe,
+    removeCustomSubscribe,
     sendMsg
 };
