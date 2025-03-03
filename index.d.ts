@@ -169,4 +169,8 @@ export function call(callInfo: CallInfo): void;
 
 export function sendNotification(notificationInfo: NotificationInfo): void;
 
+export function customSubscribe(cb: (msgData: ObjectType) => boolean): number;
+
+export function removeCustomSubscribe(customSubscribeId: number): void;
+
 export function sendMsg(msg: string | ObjectType): void;
