@@ -308,6 +308,12 @@ createDevice<T extends Class<DeviceDef>>(
 ```
 createDevice() 方法用于创建设备的实例。具体用法可以参考[创建设备实例章节](#createDevice)。
 
+## onStartup()
+```ts
+export function onStartup(cb: () => void): void;
+```
+onStartup() 方法用于在 HA Coding 启动时添加一个回调函数，HA Coding 启动时会调用这个函数。
+
 ## call()
 ```ts
 call(callInfo: CallInfo): void;

@@ -165,6 +165,8 @@ export function createDevice<T extends Class<DeviceDef>>(
     ...cps: ConstructorParameters<T>
 ): InstanceType<T>;
 
+export function onStartup(cb: () => void): void;
+
 export function call(callInfo: CallInfo): void;
 
 export function sendNotification(notificationInfo: NotificationInfo): void;

@@ -22,6 +22,7 @@ import {
 } from './utils/app-utils.js';
 import { initHACoding } from './services/app-service.js';
 import { createDevice } from './actions/create-device.js';
+import { onStartup } from './actions/life-cycle.js';
 import { CallInfo, CallService } from './services/call-service.js';
 import { sendNotification } from './actions/send-notification.js';
 import { HAWebsocketService } from './services/ha-websocket-service.js';
@@ -56,6 +57,7 @@ export {
     inTimeRange,
     initHACoding,
     createDevice,
+    onStartup,
     call,
     sendNotification,
     customSubscribe,
