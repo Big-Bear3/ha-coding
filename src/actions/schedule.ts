@@ -172,16 +172,43 @@ class Schedule {
     }
 }
 
-export function schedule(time: ScheduleTask['time'], cb: () => void, repeatType: RepeatType = 'EVERY_DAY') {
+export function schedule(
+    time: ScheduleTask['time'] | TimeStr[] | number[],
+    cb: () => void,
+    repeatType: RepeatType = 'EVERY_DAY'
+) {
     const schedule = Schedule.instance;
-    const taskId = schedule.addTask(time, cb, repeatType);
 
-    return {
-        pause: () => {
-            schedule.pauseTask(taskId);
-        },
-        resume: () => {
-            schedule.resumeTask(taskId);
+    if (Array.isArray(time)) {
+        const taskIds: number[] = [];
+
+        for (const timeItem of time) {
+            const taskId = schedule.addTask(timeItem, cb, repeatType);
+            taskIds.push(taskId);
         }
-    };
+
+        return {
+            pause: () => {
+                for (const taskId of taskIds) {
+                    schedule.pauseTask(taskId);
+                }
+            },
+            resume: () => {
+                for (const taskId of taskIds) {
+                    schedule.resumeTask(taskId);
+                }
+            }
+        };
+    } else {
+        const taskId = schedule.addTask(time, cb, repeatType);
+
+        return {
+            pause: () => {
+                schedule.pauseTask(taskId);
+            },
+            resume: () => {
+                schedule.resumeTask(taskId);
+            }
+        };
+    }
 }

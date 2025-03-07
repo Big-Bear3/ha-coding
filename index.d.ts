@@ -136,9 +136,9 @@ export class Timer {
 export function delay(cb: () => void, time: number): () => void;
 
 export function schedule(
-    time: TimeStr | number | ((date: DateStr, week: number) => TimeStr | number),
+    time: TimeStr | number | TimeStr[] | number[] | ((date: DateStr, week: number) => TimeStr | number),
     cb: () => void,
-    repeatType: RepeatType
+    repeatType?: RepeatType
 );
 
 export function ref<T>(value?: T): Ref<T>;
