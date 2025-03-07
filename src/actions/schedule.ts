@@ -5,7 +5,7 @@ import { timeStrToTimeMillis } from '../utils/date-time-utils.js';
 
 interface ScheduleTask {
     taskId: number;
-    time: TimeStr | number | ((date: DateStr, week: number) => TimeStr | number);
+    time: TimeStr | number | (TimeStr | number)[] | ((date: DateStr, week: number) => TimeStr | number | (TimeStr | number)[]);
     cb: () => void;
     repeatType: RepeatType;
     isValid: boolean;
@@ -127,17 +127,23 @@ class Schedule {
             if (!task.repeatType(this.currentDateStr, this.currentDayOfWeek)) return;
         }
 
-        const taskTime = typeof task.time === 'function' ? task.time(this.currentDateStr, this.currentDayOfWeek) : task.time;
+        let taskTime = typeof task.time === 'function' ? task.time(this.currentDateStr, this.currentDayOfWeek) : task.time;
 
-        const delayTime = fromNow ? this.getDelayTimeFromNow(taskTime) : this.getDelayTimeFromDayStartTime(taskTime);
+        if (!Array.isArray(taskTime)) {
+            taskTime = [taskTime];
+        }
 
-        if (delayTime < 0) return;
+        for (const taskTimeItem of taskTime) {
+            const delayTime = fromNow ? this.getDelayTimeFromNow(taskTimeItem) : this.getDelayTimeFromDayStartTime(taskTimeItem);
 
-        setTimeout(() => {
-            if (task.isValid) {
-                task.cb();
-            }
-        }, delayTime);
+            if (delayTime < 0) continue;
+
+            setTimeout(() => {
+                if (task.isValid) {
+                    task.cb();
+                }
+            }, delayTime);
+        }
     }
 
     getDelayTimeFromDayStartTime(time: TimeStr | number): number {
@@ -172,43 +178,16 @@ class Schedule {
     }
 }
 
-export function schedule(
-    time: ScheduleTask['time'] | (TimeStr | number)[],
-    cb: () => void,
-    repeatType: RepeatType = 'EVERY_DAY'
-) {
+export function schedule(time: ScheduleTask['time'], cb: () => void, repeatType: RepeatType = 'EVERY_DAY') {
     const schedule = Schedule.instance;
+    const taskId = schedule.addTask(time, cb, repeatType);
 
-    if (Array.isArray(time)) {
-        const taskIds: number[] = [];
-
-        for (const timeItem of time) {
-            const taskId = schedule.addTask(timeItem, cb, repeatType);
-            taskIds.push(taskId);
+    return {
+        pause: () => {
+            schedule.pauseTask(taskId);
+        },
+        resume: () => {
+            schedule.resumeTask(taskId);
         }
-
-        return {
-            pause: () => {
-                for (const taskId of taskIds) {
-                    schedule.pauseTask(taskId);
-                }
-            },
-            resume: () => {
-                for (const taskId of taskIds) {
-                    schedule.resumeTask(taskId);
-                }
-            }
-        };
-    } else {
-        const taskId = schedule.addTask(time, cb, repeatType);
-
-        return {
-            pause: () => {
-                schedule.pauseTask(taskId);
-            },
-            resume: () => {
-                schedule.resumeTask(taskId);
-            }
-        };
-    }
+    };
 }
