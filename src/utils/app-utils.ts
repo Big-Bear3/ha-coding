@@ -24,20 +24,26 @@ function isNotWorkDay(date?: DateStr): boolean {
 }
 
 function getSunInfo(date?: DateStr): SunInfo {
-    return suncalc.getTimes(
+    const sunInfo: any = suncalc.getTimes(
         date ? dayjs(date).toDate() : dayjs().toDate(),
         GEOGRAPHIC_LOCATION[0],
         GEOGRAPHIC_LOCATION[1],
         GEOGRAPHIC_LOCATION[2]
     );
+
+    for (const key of Object.keys(sunInfo)) {
+        sunInfo[key] = dayjs(sunInfo[key]).format('HH:mm:ss');
+    }
+
+    return sunInfo;
 }
 
 function getSunriseTime(date?: DateStr): TimeStr {
-    return dayjs(getSunInfo(date).sunrise).format('YYYY-MM-DD') as TimeStr;
+    return getSunInfo(date).sunrise;
 }
 
 function getSunsetTime(date?: DateStr): TimeStr {
-    return dayjs(getSunInfo(date).sunset).format('YYYY-MM-DD') as TimeStr;
+    return getSunInfo(date).sunset;
 }
 
 function inTimeRange(startTime: TimeStr, endTime: TimeStr): boolean {

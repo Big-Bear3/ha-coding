@@ -44,18 +44,18 @@ type MinutesOrSeconds = '00' | '01' | '02' | '03' | '04' | '05' | '06' | '07' | 
 export type TimeStr = `${Hours}:${MinutesOrSeconds}:${MinutesOrSeconds}`;
 
 export interface SunInfo {
-    dawn: Date;
-    dusk: Date;
-    goldenHour: Date;
-    goldenHourEnd: Date;
-    nadir: Date;
-    nauticalDawn: Date;
-    nauticalDusk: Date;
-    night: Date;
-    nightEnd: Date;
-    solarNoon: Date;
-    sunrise: Date;
-    sunriseEnd: Date;
-    sunset: Date;
-    sunsetStart: Date;
+    dawn: TimeStr;
+    dusk: TimeStr;
+    goldenHour: TimeStr;
+    goldenHourEnd: TimeStr;
+    nadir: TimeStr;
+    nauticalDawn: TimeStr;
+    nauticalDusk: TimeStr;
+    night: TimeStr;
+    nightEnd: TimeStr;
+    solarNoon: TimeStr;
+    sunrise: TimeStr;
+    sunriseEnd: TimeStr;
+    sunset: TimeStr;
+    sunsetStart: TimeStr;
 }
