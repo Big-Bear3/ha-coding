@@ -173,7 +173,7 @@ class Schedule {
 }
 
 export function schedule(
-    time: ScheduleTask['time'] | TimeStr[] | number[],
+    time: ScheduleTask['time'] | (TimeStr | number)[],
     cb: () => void,
     repeatType: RepeatType = 'EVERY_DAY'
 ) {
