@@ -61,11 +61,13 @@ export function onChange<T>(
     const observerId = effectManager.addObserver(effects, handledCb);
 
     if (onChangeOptions?.immediate) {
-        if (Array.isArray(oldStatesGetterRes)) {
-            cb(oldStatesGetterRes, []);
-        } else {
-            cb(oldStatesGetterRes, undefined);
-        }
+        process.nextTick(() => {
+            if (Array.isArray(oldStatesGetterRes)) {
+                cb(oldStatesGetterRes, []);
+            } else {
+                cb(oldStatesGetterRes, undefined);
+            }
+        });
     }
 
     return {
