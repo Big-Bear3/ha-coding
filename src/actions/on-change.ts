@@ -45,7 +45,7 @@ export function onChange<T>(
                 const actionInfo = stateManager.getActionInfoByActionFn(statesGetterRes as Function);
                 if (actionInfo) {
                     const effectValue = effectManager.getCurrentEffectValue(actionInfo.instance, actionInfo.name);
-                    cb(effectValue.value, undefined);
+                    cb(effectValue?.value, undefined);
                     oldStatesGetterRes = undefined;
                 } else {
                     cb(statesGetterRes, oldStatesGetterRes);
