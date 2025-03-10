@@ -27,7 +27,9 @@ export class EffectManager {
 
     readonly #observerIdToEffects = new Map<number, Effect[]>();
 
-    readonly #currentEffectValues = new Map<ObjectType, Map<ObjectKey, EffectValue>>();
+    #todoEffectValues = new Map<ObjectType, Map<ObjectKey, EffectValue>>();
+
+    #currentEffectValues = new Map<ObjectType, Map<ObjectKey, EffectValue>>();
 
     #currentTrackingEffects: Effect[] = [];
 
@@ -56,16 +58,19 @@ export class EffectManager {
     }
 
     broadcast(effectValue: EffectValue): void {
-        const oldSize = this.#currentEffectValues.size;
+        const oldSize = this.#todoEffectValues.size;
 
-        let targetInstanceToEffectValue = this.#currentEffectValues.get(effectValue.effect.instance);
+        let targetInstanceToEffectValue = this.#todoEffectValues.get(effectValue.effect.instance);
         if (!targetInstanceToEffectValue) targetInstanceToEffectValue = new Map();
-        this.#currentEffectValues.set(effectValue.effect.instance, targetInstanceToEffectValue);
+        this.#todoEffectValues.set(effectValue.effect.instance, targetInstanceToEffectValue);
         targetInstanceToEffectValue.set(effectValue.effect.state, effectValue);
 
         if (oldSize > 0) return;
 
-        process.nextTick(() => {
+        setTimeout(() => {
+            this.#currentEffectValues = this.#todoEffectValues;
+            this.#todoEffectValues = new Map();
+
             const targetObserverInfos: ObserverInfo[] = [];
             for (const [effects, observerInfo] of this.#effectsToObserver) {
                 for (const effect of effects) {
@@ -76,8 +81,6 @@ export class EffectManager {
                 }
             }
 
-            this.#currentEffectValues.clear();
-
             for (const targetObserverInfo of targetObserverInfos) {
                 try {
                     targetObserverInfo.observer();
@@ -85,7 +88,9 @@ export class EffectManager {
                     console.error(error);
                 }
             }
-        });
+
+            this.#currentEffectValues.clear();
+        }, 50);
     }
 
     track(): void {
