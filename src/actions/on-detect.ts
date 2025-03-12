@@ -14,7 +14,7 @@ export function onDetect<T>(statesGetter: () => T, cb: (states: any, historyStat
 
                 setTimeout(() => {
                     historyStates.shift();
-                }, distanceFromCallTime);
+                }, periodTime - distanceFromCallTime);
             }
 
             callTime = null;
