@@ -268,6 +268,30 @@ export type RepeatType =
     | ((date: DateStr, week: number) => boolean); // 返回值为真则当日执行，为假当日不执行。 date - 当天的日期，week - 当天是周几（0是周日，1是周一，2是周二 ...以此类推）。
 ```
 
+## onDetect()
+```ts
+function onDetect<T>(
+    statesGetter: () => T,
+    cb: (states: CbStates<T>, historyStates: CbStates<T>[]) => void,
+    periodTime: number
+): {
+    pause: () => void;
+    resume: () => void;
+    reset: () => void;
+};
+```
+onDetect() 方法用于记录一段时间内的状态，供用户判断，并执行相关逻辑。如：温度在3小时内变化超过5度，执行某段逻辑。
+
+参数：
+- statesGetter - 用于指定需要监听的设备状态，可以同时监听多个设备的多个状态。
+- cb - 状态变化后调用的回调方法。
+- periodTime - 指定时间段。
+
+返回值：
+1. pause - 调用该方法以暂停监听
+2. resume - 调用该方法以恢复监听
+3. reset - 重置（清除历史状态）
+
 ## @Device()
 ```ts
 function Device(): ClassDecorator;
