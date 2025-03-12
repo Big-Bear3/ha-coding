@@ -22,7 +22,7 @@ describe('事件', () => {
             400
         );
 
-        onDetect(
+        const { reset } = onDetect(
             () => light.colorTemperature,
             (value, history) => {
                 colorTemperature = value;
@@ -64,5 +64,17 @@ describe('事件', () => {
                 assert.strictEqual(historyColorTemperature.length, 2);
             }, 10);
         }, 500);
+
+        setTimeout(() => {
+            reset();
+
+            light.colorTemperature = 40;
+
+            setTimeout(() => {
+                assert.strictEqual(light.colorTemperature, 40);
+                assert.strictEqual(historyColorTemperature.length, 1);
+                assert.strictEqual(historyColorTemperature?.[0], 30);
+            }, 10);
+        }, 600);
     }, 100);
 });
