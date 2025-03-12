@@ -1,14 +1,30 @@
 import { onChange } from './on-change.js';
 
 export function onDetect<T>(statesGetter: () => T, cb: (states: any, historyStates: any[]) => void, periodTime: number) {
+    let callTime = new Date().getTime();
+
     const historyStates: any[] = [];
 
     const onChangeCb = (states: any, oldStates: any): void => {
-        historyStates.push(oldStates);
+        if (callTime) {
+            const distanceFromCallTime = new Date().getTime() - callTime;
 
-        setTimeout(() => {
-            historyStates.shift();
-        }, periodTime);
+            if (distanceFromCallTime <= periodTime) {
+                historyStates.push(oldStates);
+
+                setTimeout(() => {
+                    historyStates.shift();
+                }, distanceFromCallTime);
+            }
+
+            callTime = null;
+        } else {
+            historyStates.push(oldStates);
+
+            setTimeout(() => {
+                historyStates.shift();
+            }, periodTime);
+        }
 
         cb(states, historyStates);
     };
