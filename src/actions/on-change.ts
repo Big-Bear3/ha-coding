@@ -1,6 +1,7 @@
 import { cloneDeep } from 'lodash-es';
 import { EffectManager } from '../managers/effect-manager.js';
 import { StateManager } from '../managers/state-manager.js';
+import { nextTick } from 'process';
 
 export function onChange<T>(
     statesGetter: () => T,
@@ -61,7 +62,7 @@ export function onChange<T>(
     const observerId = effectManager.addObserver(effects, handledCb);
 
     if (onChangeOptions?.immediate) {
-        process.nextTick(() => {
+        nextTick(() => {
             if (Array.isArray(oldStatesGetterRes)) {
                 cb(oldStatesGetterRes, []);
             } else {

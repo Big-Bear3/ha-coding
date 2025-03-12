@@ -105,6 +105,16 @@ export function onChange<T>(
     resume: () => void;
 };
 
+export function onDetect<T>(
+    statesGetter: () => T,
+    cb: (states: CbStates<T>, historyStates: CbStates<T>[]) => void,
+    periodTime: number
+): {
+    pause: () => void;
+    resume: () => void;
+    reset: () => void;
+};
+
 export function onKeep(
     statesJudger: () => boolean,
     cb: () => void,

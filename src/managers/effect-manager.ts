@@ -67,7 +67,7 @@ export class EffectManager {
 
         if (oldSize > 0) return;
 
-        setTimeout(() => {
+        Promise.resolve().then(() => {
             this.#currentEffectValues = this.#todoEffectValues;
             this.#todoEffectValues = new Map();
 
@@ -90,7 +90,7 @@ export class EffectManager {
             }
 
             this.#currentEffectValues.clear();
-        }, 50);
+        });
     }
 
     track(): void {

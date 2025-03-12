@@ -39,16 +39,18 @@ describe('事件', () => {
             }
         );
 
-        light.turnOn(333);
-
-        nextTick(() => {
-            light.turnOff('张', 3);
-        });
-
         setTimeout(() => {
-            assert.strictEqual(flag, 3);
-        }, 10);
-    }, 1);
+            light.turnOn(333);
+
+            setTimeout(() => {
+                light.turnOff('张', 3);
+            }, 100);
+
+            setTimeout(() => {
+                assert.strictEqual(flag, 3);
+            }, 200);
+        }, 100);
+    }, 100);
 });
 
 describe('事件immediate', () => {
@@ -103,18 +105,20 @@ describe('事件immediate', () => {
             { immediate: true }
         );
 
-        isFirst = false;
-
-        light.turnOn(333);
-
-        nextTick(() => {
-            light.turnOff('张', 3);
-        });
-
         setTimeout(() => {
-            assert.strictEqual(flag, 5);
-        }, 10);
-    }, 1);
+            isFirst = false;
+
+            light.turnOn(333);
+
+            setTimeout(() => {
+                light.turnOff('张', 3);
+            }, 100);
+
+            setTimeout(() => {
+                assert.strictEqual(flag, 5);
+            }, 200);
+        }, 100);
+    }, 100);
 });
 
 describe('状态', () => {
@@ -174,25 +178,27 @@ describe('状态', () => {
             }
         );
 
-        light.status = 1;
-
-        nextTick(() => {
-            light.status = 2;
-        });
-
         setTimeout(() => {
-            light.brightness = '80%';
+            light.status = 1;
 
-            nextTick(() => {
-                light.brightness = '100%';
-                light.colorTemperature = 4500;
-            });
-        }, 1);
+            setTimeout(() => {
+                light.status = 2;
+            }, 100);
 
-        setTimeout(() => {
-            assert.strictEqual(flag, 6);
-        }, 10);
-    }, 1);
+            setTimeout(() => {
+                light.brightness = '80%';
+
+                setTimeout(() => {
+                    light.brightness = '100%';
+                    light.colorTemperature = 4500;
+                }, 100);
+            }, 200);
+
+            setTimeout(() => {
+                assert.strictEqual(flag, 6);
+            }, 500);
+        }, 100);
+    }, 100);
 });
 
 describe('变量', () => {
@@ -244,15 +250,17 @@ describe('变量', () => {
         { immediate: true }
     );
 
-    isFirst = false;
-
-    v1.value = 1234;
-    v2.value = 4567;
-    v3.value = 1000;
-
     setTimeout(() => {
-        assert.strictEqual(flag, 4);
-    }, 10);
+        isFirst = false;
+
+        v1.value = 1234;
+        v2.value = 4567;
+        v3.value = 1000;
+
+        setTimeout(() => {
+            assert.strictEqual(flag, 4);
+        }, 100);
+    }, 100);
 });
 
 describe('混合', () => {
@@ -307,27 +315,29 @@ describe('混合', () => {
         }
     );
 
-    light.status = -1;
-    light.turnOn(666);
-    v1.value = 1;
-    v2.value = 2;
-
-    nextTick(() => {
-        light.status = -2;
-
-        nextTick(() => {
-            light.turnOn(888);
-
-            nextTick(() => {
-                v1.value = 11;
-                v2.value = 22;
-            });
-        });
-    });
-
     setTimeout(() => {
-        assert.strictEqual(flag, 4);
-    }, 10);
+        light.status = -1;
+        light.turnOn(666);
+        v1.value = 1;
+        v2.value = 2;
+
+        setTimeout(() => {
+            light.status = -2;
+
+            setTimeout(() => {
+                light.turnOn(888);
+
+                setTimeout(() => {
+                    v1.value = 11;
+                    v2.value = 22;
+                }, 100);
+            }, 100);
+        }, 100);
+
+        setTimeout(() => {
+            assert.strictEqual(flag, 4);
+        }, 400);
+    }, 100);
 });
 
 describe('暂停&恢复', () => {
@@ -353,20 +363,20 @@ describe('暂停&恢复', () => {
 
     pause();
 
-    nextTick(() => {
+    setTimeout(() => {
         light.turnOn(1);
         light.colorTemperature = 5000;
-    });
+    }, 100);
 
     setTimeout(() => {
         resume();
         light.turnOn(2);
         light.colorTemperature = 6000;
-    }, 1);
+    }, 200);
 
     setTimeout(() => {
         assert.strictEqual(flag, 2);
-    }, 10);
+    }, 300);
 });
 
 describe('对象类型', () => {
@@ -386,12 +396,12 @@ describe('对象类型', () => {
 
         setTimeout(() => {
             light.gradient.on = 400;
-        }, 1);
+        }, 100);
 
         setTimeout(() => {
             assert.strictEqual(flag, 1);
-        }, 10);
-    }, 1);
+        }, 200);
+    }, 100);
 });
 
 describe('自由组合', () => {
@@ -414,12 +424,12 @@ describe('自由组合', () => {
 
         setTimeout(() => {
             light.turnOn(-1);
-        }, 1);
+        }, 100);
 
         setTimeout(() => {
             assert.strictEqual(flag, 2);
-        }, 10);
-    }, 1);
+        }, 200);
+    }, 100);
 });
 
 describe('@State装饰ref变量', () => {
@@ -448,14 +458,14 @@ describe('@State装饰ref变量', () => {
 
         setTimeout(() => {
             light.color = ref('green');
-        }, 1);
+        }, 100);
 
         setTimeout(() => {
             light.color.value = 'blue';
-        }, 2);
+        }, 200);
 
         setTimeout(() => {
             assert.strictEqual(flag, 3);
-        }, 10);
-    }, 1);
+        }, 300);
+    }, 100);
 });

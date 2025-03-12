@@ -2,6 +2,7 @@ import { Device } from './decorators/device.js';
 import { State } from './decorators/state.js';
 import { Action } from './decorators/action.js';
 import { onChange } from './actions/on-change.js';
+import { onDetect } from './actions/on-detect.js';
 import { onKeep } from './actions/on-keep.js';
 import { stage, step } from './actions/stage.js';
 import { Timer } from './actions/timer.js';
@@ -38,6 +39,7 @@ export {
     State,
     Action,
     onChange,
+    onDetect,
     onKeep,
     stage,
     step,

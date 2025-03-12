@@ -40,7 +40,9 @@ describe('顺序发生', () => {
             )
         );
 
-        assert.strictEqual(flag, 1);
+        setTimeout(() => {
+            assert.strictEqual(flag, 1);
+        });
 
         setTimeout(() => {
             light.status = 6;
