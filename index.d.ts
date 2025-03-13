@@ -118,7 +118,8 @@ export function onDetect<T>(
 export function onKeep(
     statesJudger: () => boolean,
     cb: () => void,
-    keepTime?: number
+    keepTime?: number,
+    lifeCycle?: { onMatch?: () => void; onBreak?: () => void }
 ): {
     stop: () => void;
     resume: () => void;

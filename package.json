@@ -1,6 +1,6 @@
 {
     "name": "ha-coding",
-    "version": "0.0.1-beta.14",
+    "version": "0.0.1-beta.15",
     "main": "index.js",
     "types": "index.d.ts",
     "type": "module",

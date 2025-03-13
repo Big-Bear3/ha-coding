@@ -1,6 +1,11 @@
 import { Effect, EffectManager } from '../managers/effect-manager.js';
 
-export function onKeep(statesJudger: () => boolean, cb: () => void, keepTime?: number) {
+export function onKeep(
+    statesJudger: () => boolean,
+    cb: () => void,
+    keepTime?: number,
+    lifeCycle?: { onMatch?: () => void; onBreak?: () => void }
+) {
     const effectManager = EffectManager.instance;
 
     let timeout: NodeJS.Timeout;
@@ -14,6 +19,9 @@ export function onKeep(statesJudger: () => boolean, cb: () => void, keepTime?: n
 
         if (res) {
             if (timeout) return;
+
+            if (lifeCycle?.onMatch) lifeCycle.onMatch();
+
             timeout = setTimeout(() => {
                 cb();
                 timeout = null;
@@ -21,6 +29,8 @@ export function onKeep(statesJudger: () => boolean, cb: () => void, keepTime?: n
         } else {
             clearTimeout(timeout);
             timeout = null;
+
+            if (lifeCycle?.onBreak) lifeCycle.onBreak();
         }
 
         if (observerId) {
