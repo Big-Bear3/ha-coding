@@ -58,7 +58,7 @@ describe('混合状态持续', () => {
         setTimeout(() => {
             assert.strictEqual(flag, 2);
         }, 469);
-    }, 1);
+    }, 100);
 });
 
 describe('停止&恢复', () => {
@@ -97,5 +97,5 @@ describe('停止&恢复', () => {
         setTimeout(() => {
             assert.strictEqual(flag, 2);
         }, 619);
-    }, 1);
+    }, 100);
 });

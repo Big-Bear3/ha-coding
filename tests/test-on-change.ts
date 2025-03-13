@@ -2,7 +2,6 @@ import { describe } from 'node:test';
 import { MiLight } from './devices-def/mi-light.js';
 import assert from 'assert';
 import { onChange, ref } from '../index.js';
-import { nextTick } from 'process';
 
 describe('事件', () => {
     const light = new MiLight();

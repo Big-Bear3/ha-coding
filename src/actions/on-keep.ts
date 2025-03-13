@@ -20,12 +20,11 @@ export function onKeep(
         if (res) {
             if (timeout) return;
 
-            if (lifeCycle?.onMatch) lifeCycle.onMatch();
-
             timeout = setTimeout(() => {
                 cb();
-                timeout = null;
             }, keepTime ?? 0);
+
+            if (lifeCycle?.onMatch) lifeCycle.onMatch();
         } else {
             clearTimeout(timeout);
             timeout = null;
@@ -46,11 +45,19 @@ export function onKeep(
     return {
         stop: () => {
             clearTimeout(timeout);
+            timeout = null;
             effectManager.removeObserver(observerId);
         },
         resume: () => {
             handledCb();
             effectManager.addObserver(currentEffects, handledCb, observerId);
+        },
+        miss: () => {
+            clearTimeout(timeout);
+        },
+        hit: () => {
+            clearTimeout(timeout);
+            cb();
         }
     };
 }

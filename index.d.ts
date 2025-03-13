@@ -123,6 +123,8 @@ export function onKeep(
 ): {
     stop: () => void;
     resume: () => void;
+    miss: () => void;
+    hit: () => void;
 };
 
 export function stage<T extends [ReturnType<typeof step<any>>, ReturnType<typeof step<any>>, ...ReturnType<typeof step<any>>[]]>(
