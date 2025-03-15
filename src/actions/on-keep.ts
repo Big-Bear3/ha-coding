@@ -1,3 +1,4 @@
+import { nextTick } from 'process';
 import { Effect, EffectManager } from '../managers/effect-manager.js';
 
 export function onKeep(
@@ -40,7 +41,9 @@ export function onKeep(
         }
     };
 
-    handledCb();
+    nextTick(() => {
+        handledCb();
+    });
 
     return {
         stop: () => {
