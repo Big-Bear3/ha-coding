@@ -81,7 +81,7 @@ export interface CallInfo {
     serviceData?: Record<string, any>;
 }
 
-export type CallInfoGetter = (value: any) => CallInfo;
+export type CallInfoGetter = (value: any) => CallInfo | Promise<CallInfo>;
 
 export interface NotificationInfo {
     entityId: string;

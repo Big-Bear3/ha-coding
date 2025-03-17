@@ -53,7 +53,13 @@ export class StateManager {
                 if (callService.callable && callInfoGetter) {
                     try {
                         const callInfo = callInfoGetter.bind(this)(value);
-                        callService.push(callInfo);
+                        if (callInfo instanceof Promise) {
+                            callInfo.then((callInfoValue) => {
+                                if (callInfoValue) callService.push(callInfoValue);
+                            });
+                        } else {
+                            if (callInfo) callService.push(callInfo);
+                        }
                     } catch (error) {
                         console.error(error);
                     }

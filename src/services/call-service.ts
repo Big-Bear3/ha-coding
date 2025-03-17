@@ -10,7 +10,7 @@ export interface CallInfo {
     mergable?: boolean;
 }
 
-export type CallInfoGetter = (value: any) => CallInfo;
+export type CallInfoGetter = (value: any) => CallInfo | Promise<CallInfo>;
 
 export class CallService {
     static #instance: CallService;
