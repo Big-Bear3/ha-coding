@@ -189,3 +189,5 @@ export function customSubscribe(cb: (msgData: ObjectType) => boolean): number;
 export function removeCustomSubscribe(customSubscribeId: number): void;
 
 export function sendMsg(msg: string | ObjectType): void;
+
+export function getGeographicLocation(): [number, number, number];

@@ -29,10 +29,13 @@ import { sendNotification } from './actions/send-notification.js';
 import { HAWebsocketService } from './services/ha-websocket-service.js';
 import { customSubscribe, removeCustomSubscribe } from './actions/custom-subscribe.js';
 import type { ObjectType } from './types/types';
+import { GEOGRAPHIC_LOCATION } from './config/config.js';
 
 const call = (callInfo: CallInfo) => CallService.instance.push(callInfo);
 
 const sendMsg = (msg: string | ObjectType) => HAWebsocketService.instance.send(msg);
+
+const getGeographicLocation = () => GEOGRAPHIC_LOCATION;
 
 export {
     Device,
@@ -64,5 +67,6 @@ export {
     sendNotification,
     customSubscribe,
     removeCustomSubscribe,
-    sendMsg
+    sendMsg,
+    getGeographicLocation
 };
