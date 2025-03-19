@@ -68,6 +68,7 @@ export interface HAEvent<A = any, S = any> {
 export interface Ref<T = any> {
     value: T;
     trigger: () => void;
+    asPersistent: (key: string) => Ref<T>;
 }
 
 export interface DeviceDef {

@@ -15,3 +15,4 @@ npm-debug.log*
 .history
 .VSCodeCounter
 .dist
+.localstorage
