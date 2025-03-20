@@ -313,7 +313,7 @@ function State(callInfoGetter: CallInfoGetter, stateOptions: StateOptions): Prop
 ```
 @State() 装饰器装饰的变量会变为响应式变量，可以被 onChange()、onKeep() 等方法监听。
 参数：
-- callInfoGetter - 返回CallInfo对象，告知系统如何向 HA 发送报文以更新设备状态。
+- callInfoGetter - 返回CallInfo对象，告知系统如何向 Home Assistant 发送报文以更新设备状态。
 - stateOptions - 目前内部仅有一个属性 persistentKeyGetter，该属性是方法类型，如果你需要持久化这个 state 成员变量，可以设置该方法，并返回一个唯一的key，每次值变化时，系统将用这个 key 作为键将其持久化 (保存到磁盘上)。下次系统启动时，系统会根据这个 key，取回持久化的值赋值给该成员变量。取回的值的优先级大于为其赋的初始值。
 
 ## @Action()
@@ -415,6 +415,6 @@ export function getSunsetTime(date?: DateStr): TimeStr;
 /** 判断是否在某一时间范围内 */
 export function inTimeRange(startTime: TimeStr, endTime: TimeStr): boolean;
 
-/** 获取在 HA 中设置的地理位置 [纬度, 经度, 海拔] */
+/** 获取在 Home Assistant 中设置的地理位置 [纬度, 经度, 海拔] */
 export function getGeographicLocation(): [number, number, number];
 ```
