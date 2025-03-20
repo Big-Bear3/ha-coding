@@ -306,9 +306,15 @@ function Device(): ClassDecorator;
 
 ## @State()
 ```ts
-function State(callInfoGetter?: CallInfoGetter): PropertyDecorator;
+function State(): PropertyDecorator;
+function State(callInfoGetter: CallInfoGetter): PropertyDecorator;
+function State(stateOptions: StateOptions): PropertyDecorator;
+function State(callInfoGetter: CallInfoGetter, stateOptions: StateOptions): PropertyDecorator;
 ```
 @State() 装饰器装饰的变量会变为响应式变量，可以被 onChange()、onKeep() 等方法监听。
+参数：
+- callInfoGetter - 返回CallInfo对象，告知系统如何向 HA 发送报文以更新设备状态。
+- stateOptions - 目前内部仅有一个属性 persistentKeyGetter，该属性是方法类型，如果你需要持久化这个 state 成员变量，可以设置该方法，并返回一个唯一的key，每次值变化时，系统将用这个 key 作为键将其持久化 (保存到磁盘上)。下次系统启动时，系统会根据这个 key，取回持久化的值赋值给该成员变量。取回的值的优先级大于为其赋的初始值。
 
 ## @Action()
 ```ts
@@ -320,13 +326,16 @@ function Action(): MethodDecorator;
 ```ts
 function ref<T>(value?: T): Ref<T>;
 ```
-schedule() 方法用于创建响应式变量，与被State()装饰器装饰的变量一样，同样可以被 onChange()、onKeep() 等方法监听。
+ref() 方法用于创建响应式变量，与被State()装饰器装饰的变量一样，同样可以被 onChange()、onKeep() 等方法监听。
 
 参数：
 - value - 变量的初始值。
 
 返回值：
-创建的响应式变量。
+创建的响应式变量。该变量有3个属性：
+- value - 响应式变量的值。
+- trigger - 调用 trigger 方法以立即触发监听该 ref 对象的所有回调方法。
+- asPersistent - 调用此方法可以将这个 ref 对象的值进行持久化（保存到磁盘上），该方法需要向其传递一个 key，并保证其唯一性，每次这个 ref 对象的值变化时，系统将用这个 key 作为键存储这个值。下次系统启动时，系统会根据这个 key，取回持久化的值赋值给 ref 对象 (ref.value)。取回的值的优先级大于传入 ref 方法的参数值，如：const r = ref(123).asPersistent('my_key'); r.value = 456; 下次进入系统时，r.value 的值为 456。
 
 ## createDevice()
 ```ts
