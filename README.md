@@ -414,4 +414,7 @@ export function getSunsetTime(date?: DateStr): TimeStr;
 
 /** 判断是否在某一时间范围内 */
 export function inTimeRange(startTime: TimeStr, endTime: TimeStr): boolean;
+
+/** 获取在 HA 中设置的地理位置 [纬度, 经度, 海拔] */
+export function getGeographicLocation(): [number, number, number];
 ```
