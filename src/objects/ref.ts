@@ -17,8 +17,10 @@ export function ref<T>(value?: T): Ref<T> {
             stateManager.triggerRef(refObj);
         },
         asPersistent: (key: string): Ref => {
-            persistentKey = key;
-            stateManager.setRefAsPersistent(refObj, persistentKey);
+            if (key) {
+                persistentKey = key;
+                stateManager.setRefAsPersistent(refObj, persistentKey);
+            }
             return refObj;
         }
     };

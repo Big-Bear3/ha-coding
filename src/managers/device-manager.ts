@@ -1,4 +1,5 @@
 import { Device } from '../actions/create-device.js';
+import { StateManager } from './state-manager.js';
 
 export class DeviceManager {
     static #instance: DeviceManager;
@@ -12,6 +13,8 @@ export class DeviceManager {
     private constructor() {}
 
     registerDevice(device: Device): void {
+        StateManager.instance.handlePersistentStates(device);
+
         for (const entityId of Object.values(device.$entityIds)) {
             this.devicesMap.set(entityId, device);
         }

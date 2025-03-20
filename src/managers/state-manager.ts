@@ -4,12 +4,14 @@ import { cloneDeep, isEqual } from 'lodash-es';
 import { CallInfoGetter, CallService } from '../services/call-service.js';
 import { EffectManager } from './effect-manager.js';
 import { localStorage } from '../utils/local-storage.js';
+import { StateOptions } from 'src/decorators/state';
 
 interface StateInfo {
     name: ObjectKey;
     type: 'state' | 'action';
     callInfoGetter?: CallInfoGetter;
     originalActionFn?: (...args: unknown[]) => unknown;
+    stateOptions?: StateOptions;
 }
 
 interface ActionInfo {
@@ -28,17 +30,16 @@ export class StateManager {
 
     readonly #refObjToPersistentKey = new WeakMap<Ref, string>();
 
-    readonly #deviceInstanceToPersistentKeys = new WeakMap<ObjectType, Record<ObjectKey, string>>();
-
     private constructor() {}
 
-    handleState(c: Class, key: ObjectKey, callInfoGetter?: CallInfoGetter): void {
+    handleState(c: Class, key: ObjectKey, callInfoGetter?: CallInfoGetter, stateOptions?: StateOptions): void {
         const effectManager = EffectManager.instance;
 
         this.setClassState(c, {
             name: key,
             type: 'state',
-            callInfoGetter
+            callInfoGetter,
+            stateOptions
         });
 
         Reflect.defineProperty(c, key, {
@@ -52,6 +53,11 @@ export class StateManager {
                 const oldValue = this[key];
 
                 StateManager.instance.setStateValue(this, key, value);
+
+                const persistentKey = stateOptions?.persistentKey;
+                if (persistentKey) {
+                    if (persistentKey) StateManager.instance.setPersistentValue(persistentKey, value);
+                }
 
                 const callService = CallService.instance;
 
@@ -100,7 +106,7 @@ export class StateManager {
 
                 const refPersistentKey = StateManager.instance.getRefPersistentKey(refObj);
                 if (refPersistentKey) {
-                    StateManager.instance.setRefPersistentValue(refPersistentKey, value);
+                    StateManager.instance.setPersistentValue(refPersistentKey, value);
                 }
 
                 effectManager.broadcast({ effect: { instance: refObj, state: 'value', stateType: 'ref' }, value, oldValue });
@@ -171,6 +177,12 @@ export class StateManager {
         }
     }
 
+    getStateInfos(c: Class): StateInfo[] {
+        const stateInfoSet = this.#classToStates.get(c);
+        if (stateInfoSet) return Array.from(stateInfoSet);
+        return [];
+    }
+
     setStateValue(instance: ObjectType, key: ObjectKey, value: unknown): void {
         const instanceToStateValues = StateManager.instance.#instanceToStateValues;
         if (instanceToStateValues.has(instance)) {
@@ -199,12 +211,12 @@ export class StateManager {
     }
 
     setRefAsPersistent(refObj: Ref, key: string): void {
-        if (refObj.value === undefined) {
-            this.#refObjToPersistentKey.set(refObj, key);
-            const persistentValue = this.getRefPersistentValue(key);
-            if (persistentValue !== undefined) refObj.value = persistentValue;
+        this.#refObjToPersistentKey.set(refObj, key);
+        const persistentValue = this.getPersistentValue(key);
+        if (persistentValue === undefined) {
+            if (refObj.value !== undefined) this.setPersistentValue(key, refObj.value);
         } else {
-            this.setRefPersistentValue(key, refObj.value);
+            refObj.value = persistentValue;
         }
     }
 
@@ -212,7 +224,7 @@ export class StateManager {
         return this.#refObjToPersistentKey.get(refObj);
     }
 
-    private setRefPersistentValue(key: string, value: any): void {
+    setPersistentValue(key: string, value: any): void {
         try {
             const refPersistence = JSON.stringify({ value });
             localStorage.setItem(key, refPersistence);
@@ -221,7 +233,7 @@ export class StateManager {
         }
     }
 
-    private getRefPersistentValue(key: string): any {
+    getPersistentValue(key: string): any {
         const refPersistence = localStorage.getItem(key);
 
         if (!refPersistence) return undefined;
@@ -234,6 +246,28 @@ export class StateManager {
         }
 
         return undefined;
+    }
+
+    handlePersistentStates(deviceInstance: ObjectType): void {
+        const c = Reflect.getPrototypeOf(deviceInstance) as Class;
+        const stateInfos = this.getStateInfos(c);
+        for (const stateInfo of stateInfos) {
+            const persistentKeyGetter = stateInfo?.stateOptions?.persistentKeyGetter;
+            if (!persistentKeyGetter) continue;
+
+            const persistentKey = persistentKeyGetter.bind(deviceInstance)(deviceInstance.$entityIds);
+            if (!persistentKey) continue;
+
+            stateInfo.stateOptions.persistentKey = persistentKey;
+
+            const persistentValue = this.getPersistentValue(persistentKey);
+            if (persistentValue === undefined) {
+                if (deviceInstance[stateInfo.name] !== undefined)
+                    this.setPersistentValue(persistentKey, deviceInstance[stateInfo.name]);
+            } else {
+                deviceInstance[stateInfo.name] = persistentValue;
+            }
+        }
     }
 
     static get instance(): StateManager {

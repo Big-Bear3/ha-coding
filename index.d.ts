@@ -84,6 +84,10 @@ export interface CallInfo {
 
 export type CallInfoGetter = (value: any) => CallInfo | Promise<CallInfo>;
 
+export interface StateOptions {
+    persistentKeyGetter?: ($entityIds: Record<string, string>) => string;
+}
+
 export interface NotificationInfo {
     entityId: string;
     content: string;
@@ -91,7 +95,10 @@ export interface NotificationInfo {
 
 export function Device(): ClassDecorator;
 
-export function State(callInfoGetter?: CallInfoGetter): PropertyDecorator;
+export function State(): PropertyDecorator;
+export function State(callInfoGetter: CallInfoGetter): PropertyDecorator;
+export function State(stateOptions: StateOptions): PropertyDecorator;
+export function State(callInfoGetter: CallInfoGetter, stateOptions: StateOptions): PropertyDecorator;
 
 export function Action(): MethodDecorator;
 
