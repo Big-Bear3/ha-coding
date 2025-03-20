@@ -66,13 +66,13 @@ describe('State值持久化', () => {
         s7: string;
     }
 
-    const testLocalStorage1 = createDevice(TestLocalStorage, { test: 'test1' });
+    const testLocalStorage1 = createDevice(TestLocalStorage, { test: 'test' });
 
     testLocalStorage1.s1 = 's1';
     testLocalStorage1.s2 = 2;
     testLocalStorage1.s3 = false;
 
-    const testLocalStorage2 = createDevice(TestLocalStorage, { test: 'test2' });
+    const testLocalStorage2 = createDevice(TestLocalStorage, { test: 'test' });
 
     assert.strictEqual(testLocalStorage2.s1, 's1');
     assert.strictEqual(testLocalStorage2.s2, 2);
@@ -84,19 +84,21 @@ describe('State值持久化', () => {
 
     setTimeout(() => {
         testLocalStorage1.s2 = 3;
-        const testLocalStorage3 = createDevice(TestLocalStorage, { test: 'test3' });
+        testLocalStorage1.s5 = 'ss55';
+        const testLocalStorage3 = createDevice(TestLocalStorage, { test: 'test' });
         assert.strictEqual(testLocalStorage3.s2, 3);
+        assert.strictEqual(testLocalStorage3.s5, 'ss55');
     }, 100);
 
     setTimeout(() => {
         testLocalStorage1.s2 = null;
-        const testLocalStorage4 = createDevice(TestLocalStorage, { test: 'test4' });
+        const testLocalStorage4 = createDevice(TestLocalStorage, { test: 'test' });
         assert.strictEqual(testLocalStorage4.s2, null);
     }, 200);
 
     setTimeout(() => {
         testLocalStorage1.s2 = undefined;
-        const testLocalStorage5 = createDevice(TestLocalStorage, { test: 'test5' });
+        const testLocalStorage5 = createDevice(TestLocalStorage, { test: 'test' });
         assert.strictEqual(testLocalStorage5.s2, undefined);
     }, 300);
 });

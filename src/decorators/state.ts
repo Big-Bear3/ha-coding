@@ -5,7 +5,6 @@ import { StateManager } from '../managers/state-manager.js';
 
 export interface StateOptions {
     persistentKeyGetter?: ($entityIds: Record<string, string>) => string;
-    persistentKey?: string;
 }
 
 export function State(): PropertyDecorator;

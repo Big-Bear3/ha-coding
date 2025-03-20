@@ -6,6 +6,8 @@ export class DeviceManager {
 
     #devicesMap = new Map<string, Device>();
 
+    #deviceInstances = new Set<Device>();
+
     private get devicesMap() {
         return this.#devicesMap;
     }
@@ -18,10 +20,16 @@ export class DeviceManager {
         for (const entityId of Object.values(device.$entityIds)) {
             this.devicesMap.set(entityId, device);
         }
+
+        this.#deviceInstances.add(device);
     }
 
     hasDevice(entityId: string): boolean {
         return this.devicesMap.has(entityId);
+    }
+
+    hasDeviceInstance(device: Device): boolean {
+        return this.#deviceInstances.has(device);
     }
 
     getDevice(entityId: string): Device {

@@ -1,10 +1,11 @@
 import type { Ref } from '../objects/ref';
 import type { Class, MethodDescriptor, ObjectKey, ObjectType } from '../types/types';
+import type { StateOptions } from '../decorators/state';
 import { cloneDeep, isEqual } from 'lodash-es';
 import { CallInfoGetter, CallService } from '../services/call-service.js';
 import { EffectManager } from './effect-manager.js';
 import { localStorage } from '../utils/local-storage.js';
-import { StateOptions } from 'src/decorators/state';
+import { DeviceManager } from './device-manager.js';
 
 interface StateInfo {
     name: ObjectKey;
@@ -54,8 +55,8 @@ export class StateManager {
 
                 StateManager.instance.setStateValue(this, key, value);
 
-                const persistentKey = stateOptions?.persistentKey;
-                if (persistentKey) {
+                if (stateOptions?.persistentKeyGetter && DeviceManager.instance.hasDeviceInstance(this)) {
+                    const persistentKey = stateOptions.persistentKeyGetter.bind(this)(this.$entityIds);
                     if (persistentKey) StateManager.instance.setPersistentValue(persistentKey, value);
                 }
 
@@ -257,8 +258,6 @@ export class StateManager {
 
             const persistentKey = persistentKeyGetter.bind(deviceInstance)(deviceInstance.$entityIds);
             if (!persistentKey) continue;
-
-            stateInfo.stateOptions.persistentKey = persistentKey;
 
             const persistentValue = this.getPersistentValue(persistentKey);
             if (persistentValue === undefined) {
