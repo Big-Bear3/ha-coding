@@ -5,7 +5,7 @@ import { timeStrToTimeMillis } from '../utils/date-time-utils.js';
 
 interface ScheduleTask {
     taskId: number;
-    time: TimeStr | number | (TimeStr | number)[] | ((date: DateStr, week: number) => TimeStr | number | (TimeStr | number)[]);
+    time: TimeStr | TimeStr[] | ((date: DateStr, week: number) => TimeStr | TimeStr[]);
     cb: () => void;
     repeatType: RepeatType;
     isValid: boolean;
@@ -13,6 +13,9 @@ interface ScheduleTask {
 
 class Schedule {
     static #instance: Schedule;
+
+    /** setTimeout每24小时，最多比系统时间提前的时间 */
+    static clockMaxFastTime = 30000;
 
     #scheduleTasks: ScheduleTask[] = [];
 
@@ -38,17 +41,33 @@ class Schedule {
         return dayjs().day();
     }
 
-    get now() {
-        return new Date().getTime();
+    private constructor() {
+        const tomorrowStartTimeDistance = this.tomorrowStartTime - new Date().getTime();
+        const prepareTimeDistance = tomorrowStartTimeDistance - Schedule.clockMaxFastTime;
+
+        if (prepareTimeDistance < 0) {
+            setTimeout(() => {
+                this.prepareAtMidnight(this.tomorrowStartTime);
+            }, 24 * 60 * 60 * 1000 + prepareTimeDistance);
+        } else {
+            setTimeout(() => {
+                this.prepareAtMidnight(this.tomorrowStartTime);
+            }, prepareTimeDistance);
+        }
     }
 
-    private constructor() {
-        const delayTimeFromNow = this.getDelayTimeFromNow(this.tomorrowStartTime);
+    prepareAtMidnight(tomorrowStartTime: number): void {
+        const tomorrowStartTimeDistance = this.tomorrowStartTime - new Date().getTime();
+
         setTimeout(() => {
+            setTimeout(() => {
+                this.prepareAtMidnight(this.tomorrowStartTime);
+            }, 24 * 60 * 60 * 1000 - Schedule.clockMaxFastTime);
+
             for (const task of this.#scheduleTasks) {
-                this.handleTask(task);
+                this.handleTask(task, tomorrowStartTime);
             }
-        }, delayTimeFromNow + 1000);
+        }, tomorrowStartTimeDistance);
     }
 
     addTask(time: ScheduleTask['time'], cb: () => void, repeatType: RepeatType = 'EVERY_DAY'): number {
@@ -64,12 +83,12 @@ class Schedule {
 
         this.#scheduleTasks.push(task);
 
-        if (this.now > this.currentDayStartTime + 1000) this.handleTask(task, true);
+        if (new Date().getTime() > this.currentDayStartTime + 1000) this.handleTask(task);
 
         return taskId;
     }
 
-    handleTask(task: ScheduleTask, fromNow = false): void {
+    handleTask(task: ScheduleTask, now?: number): void {
         if (typeof task.repeatType === 'string') {
             switch (task.repeatType) {
                 case 'EVERY_DAY':
@@ -134,32 +153,28 @@ class Schedule {
         }
 
         for (const taskTimeItem of taskTime) {
-            const delayTime = fromNow ? this.getDelayTimeFromNow(taskTimeItem) : this.getDelayTimeFromDayStartTime(taskTimeItem);
+            const delayTime = this.getDelayTime(taskTimeItem, now ?? new Date().getTime());
 
             if (delayTime < 0) continue;
 
-            setTimeout(() => {
-                if (task.isValid) {
-                    task.cb();
-                }
-            }, delayTime);
+            if (delayTime < Schedule.clockMaxFastTime + 10000) {
+                setTimeout(() => {
+                    if (task.isValid) task.cb();
+                }, delayTime);
+            } else {
+                setTimeout(() => {
+                    const innerDelayTime = this.getDelayTime(taskTimeItem, new Date().getTime());
+
+                    setTimeout(() => {
+                        if (task.isValid) task.cb();
+                    }, innerDelayTime);
+                }, delayTime - Schedule.clockMaxFastTime);
+            }
         }
     }
 
-    getDelayTimeFromDayStartTime(time: TimeStr | number): number {
-        if (typeof time === 'number') {
-            return time - this.currentDayStartTime;
-        } else {
-            return timeStrToTimeMillis(time);
-        }
-    }
-
-    getDelayTimeFromNow(time: TimeStr | number): number {
-        if (typeof time === 'number') {
-            return time - this.now;
-        } else {
-            return timeStrToTimeMillis(time) - this.getDelayTimeFromDayStartTime(this.now);
-        }
+    getDelayTime(time: TimeStr, from: number): number {
+        return timeStrToTimeMillis(time) - (from - this.currentDayStartTime);
     }
 
     pauseTask(taskId: number): void {

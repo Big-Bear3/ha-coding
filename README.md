@@ -252,7 +252,7 @@ delay() 方法用于延时执行某段逻辑，与 Timer 不同的是，再次�
 ## schedule()
 ```ts
 function schedule(
-    time: TimeStr | number | ((date: DateStr, week: number) => TimeStr | number),
+    time: TimeStr | TimeStr[] | ((date: DateStr, week: number) => TimeStr | TimeStr[]),
     cb: () => void,
     repeatType: RepeatType
 );
