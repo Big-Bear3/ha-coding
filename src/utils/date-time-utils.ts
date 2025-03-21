@@ -1,5 +1,6 @@
 import type { TimeStr } from '../types/types';
 
+/** 获取指定时间距当天开始时间的毫秒数 */
 export function timeStrToTimeMillis(time: TimeStr): number {
     const timeParts = time.split(':');
     const hour = Number(timeParts[0]);
