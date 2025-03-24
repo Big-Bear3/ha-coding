@@ -9,6 +9,10 @@ import { customSubscribers } from '../actions/custom-subscribe.js';
 export class HAWebsocketService {
     static #instance: HAWebsocketService;
 
+    static #reconnectTimeoutTime = 60000;
+
+    static #pingInterval = 29000;
+
     #ws: WebSocket;
 
     #currentMsgId = 0;
@@ -18,6 +22,8 @@ export class HAWebsocketService {
     #subscribeEntitiesMsgId: number;
 
     #haWebsocketReady = false;
+
+    #reconnectTimeout: NodeJS.Timeout;
 
     get newMsgId() {
         return ++this.#currentMsgId;
@@ -38,6 +44,8 @@ export class HAWebsocketService {
 
                 this.#ws.onmessage = async (msg: WebSocket.MessageEvent) => {
                     try {
+                        this.resetReceiveMsgTimeout();
+
                         const msgData = JSON.parse(msg.data as string);
 
                         for (const [customSubscribeId, customSubscriber] of customSubscribers) {
@@ -145,7 +153,29 @@ export class HAWebsocketService {
             };
             this.send(param);
             this.timedPing();
-        }, 29000);
+        }, HAWebsocketService.#pingInterval);
+    }
+
+    private resetReceiveMsgTimeout(): void {
+        clearTimeout(this.#reconnectTimeout);
+
+        this.#reconnectTimeout = setTimeout(() => {
+            this.reconnect();
+        }, HAWebsocketService.#reconnectTimeoutTime);
+    }
+
+    private reconnect(): void {
+        try {
+            this.#ws.close();
+        } catch (error) {
+            console.log(error);
+        }
+
+        try {
+            this.createHAWebsocket();
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     static get instance(): HAWebsocketService {
