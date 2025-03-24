@@ -1,3 +1,5 @@
+import type { Ref } from '../objects/ref';
+import { ref } from '../objects/ref.js';
 import { Device } from '../actions/create-device.js';
 import { StateManager } from './state-manager.js';
 
@@ -7,6 +9,8 @@ export class DeviceManager {
     #devicesMap = new Map<string, Device>();
 
     #deviceInstances = new Set<Device>();
+
+    #unavailableEntitiesMap = new Map<string, Ref<boolean>>();
 
     private get devicesMap() {
         return this.#devicesMap;
@@ -34,6 +38,42 @@ export class DeviceManager {
 
     getDevice(entityId: string): Device {
         return this.devicesMap.get(entityId);
+    }
+
+    setUnavailableEntity(entityId: string, isUnavailable: boolean): void {
+        const unavailableRef = this.#unavailableEntitiesMap.get(entityId);
+
+        if (isUnavailable) {
+            if (unavailableRef) {
+                unavailableRef.value = true;
+            } else {
+                this.#unavailableEntitiesMap.set(entityId, ref(true));
+            }
+        } else {
+            if (unavailableRef) unavailableRef.value = false;
+        }
+    }
+
+    isUnavailableEntity(entityId: string): boolean {
+        let unavailableRef = this.#unavailableEntitiesMap.get(entityId);
+        if (!unavailableRef) {
+            unavailableRef = ref(false);
+            this.#unavailableEntitiesMap.set(entityId, unavailableRef);
+        }
+
+        return unavailableRef.value;
+    }
+
+    getUnavailableEntities(): string[] {
+        const unavailableEntities: string[] = [];
+
+        for (const [entityId, unavailableRef] of this.#unavailableEntitiesMap) {
+            if (unavailableRef.value) {
+                unavailableEntities.push(entityId);
+            }
+        }
+
+        return unavailableEntities;
     }
 
     static get instance(): DeviceManager {

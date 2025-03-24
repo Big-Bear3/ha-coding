@@ -30,12 +30,17 @@ import { HAWebsocketService } from './services/ha-websocket-service.js';
 import { customSubscribe, removeCustomSubscribe } from './actions/custom-subscribe.js';
 import type { ObjectType } from './types/types';
 import { GEOGRAPHIC_LOCATION } from './config/config.js';
+import { DeviceManager } from './managers/device-manager.js';
 
 const call = (callInfo: CallInfo) => CallService.instance.push(callInfo);
 
 const sendMsg = (msg: string | ObjectType) => HAWebsocketService.instance.send(msg);
 
 const getGeographicLocation = () => GEOGRAPHIC_LOCATION;
+
+const isUnavailableEntity = (entityId: string) => DeviceManager.instance.isUnavailableEntity(entityId);
+
+const getUnavailableEntities = () => DeviceManager.instance.getUnavailableEntities();
 
 export {
     Device,
@@ -68,5 +73,7 @@ export {
     customSubscribe,
     removeCustomSubscribe,
     sendMsg,
-    getGeographicLocation
+    getGeographicLocation,
+    isUnavailableEntity,
+    getUnavailableEntities
 };
