@@ -165,6 +165,8 @@ export class HAWebsocketService {
     }
 
     private reconnect(): void {
+        console.error('HA Coding 获取ws消息超时，正在重连...');
+
         try {
             this.#ws.close();
         } catch (error) {

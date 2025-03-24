@@ -80,6 +80,7 @@ export interface CallInfo {
     entityId: string;
     service: string;
     serviceData?: Record<string, any>;
+    unmergable?: boolean;
 }
 
 export type CallInfoGetter = (value: any) => CallInfo | Promise<CallInfo>;
