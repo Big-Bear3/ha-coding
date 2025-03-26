@@ -203,4 +203,4 @@ export function getGeographicLocation(): [number, number, number];
 
 export function isUnavailableEntity(entityId: string): boolean;
 
-export function getUnavailableEntities(): string[];
+export function getUnavailableEntities(): Ref<string[]>;

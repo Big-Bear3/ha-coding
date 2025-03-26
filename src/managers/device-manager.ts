@@ -10,7 +10,7 @@ export class DeviceManager {
 
     #deviceInstances = new Set<Device>();
 
-    #unavailableEntitiesMap = new Map<string, Ref<boolean>>();
+    #unavailableEntitiesRef = ref<string[]>([]);
 
     private get devicesMap() {
         return this.#devicesMap;
@@ -41,39 +41,23 @@ export class DeviceManager {
     }
 
     setUnavailableEntity(entityId: string, isUnavailable: boolean): void {
-        const unavailableRef = this.#unavailableEntitiesMap.get(entityId);
+        const exsitedEntityIdIndex = this.#unavailableEntitiesRef.value.indexOf(entityId);
 
-        if (isUnavailable) {
-            if (unavailableRef) {
-                unavailableRef.value = true;
-            } else {
-                this.#unavailableEntitiesMap.set(entityId, ref(true));
-            }
-        } else {
-            if (unavailableRef) unavailableRef.value = false;
+        if (isUnavailable && exsitedEntityIdIndex === -1) {
+            this.#unavailableEntitiesRef.value.push(entityId);
+            this.#unavailableEntitiesRef.trigger();
+        } else if (exsitedEntityIdIndex > -1) {
+            this.#unavailableEntitiesRef.value.splice(exsitedEntityIdIndex, 1);
+            this.#unavailableEntitiesRef.trigger();
         }
     }
 
     isUnavailableEntity(entityId: string): boolean {
-        let unavailableRef = this.#unavailableEntitiesMap.get(entityId);
-        if (!unavailableRef) {
-            unavailableRef = ref(false);
-            this.#unavailableEntitiesMap.set(entityId, unavailableRef);
-        }
-
-        return unavailableRef.value;
+        return this.#unavailableEntitiesRef.value.indexOf(entityId) > -1;
     }
 
-    getUnavailableEntities(): string[] {
-        const unavailableEntities: string[] = [];
-
-        for (const [entityId, unavailableRef] of this.#unavailableEntitiesMap) {
-            if (unavailableRef.value) {
-                unavailableEntities.push(entityId);
-            }
-        }
-
-        return unavailableEntities;
+    getUnavailableEntities(): Ref<string[]> {
+        return this.#unavailableEntitiesRef;
     }
 
     static get instance(): DeviceManager {
