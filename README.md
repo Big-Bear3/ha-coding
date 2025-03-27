@@ -383,6 +383,12 @@ sendMsg(msg: string | ObjectType): void;
 ```
 sendMsg() 方法用于向Home assistant Websocket发送自定义消息。
 
+## getUnavailableEntities()
+```ts
+export function getUnavailableEntities(): Ref<string[]>;
+```
+getUnavailableEntities() 方法用于获取在 Home assistant 中不可用的设备（大概率是离线设备）。返回值是Ref包装的当前不可用的设备下的实体ID数组，可以被 onChange、onKeep 等监听。
+
 ## 其他
 ```ts
 /** 深拷贝一个对象 */
@@ -417,4 +423,10 @@ export function inTimeRange(startTime: TimeStr, endTime: TimeStr): boolean;
 
 /** 获取在 Home Assistant 中设置的地理位置 [纬度, 经度, 海拔] */
 export function getGeographicLocation(): [number, number, number];
+
+/** 判断当前实体在 Home Assistant 中的状态是否为 "不可用" */
+export function isUnavailableEntity(entityId: string): boolean;
+
+/** 获取指定实体所属的设备对象 */
+export function getBelongingDevice(entityId: string): DeviceDef;
 ```
