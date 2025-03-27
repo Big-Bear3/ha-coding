@@ -204,3 +204,5 @@ export function getGeographicLocation(): [number, number, number];
 export function isUnavailableEntity(entityId: string): boolean;
 
 export function getUnavailableEntities(): Ref<string[]>;
+
+export function getBelongingDevice(entityId: string): DeviceDef;

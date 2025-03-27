@@ -42,6 +42,8 @@ const isUnavailableEntity = (entityId: string) => DeviceManager.instance.isUnava
 
 const getUnavailableEntities = () => DeviceManager.instance.getUnavailableEntities();
 
+const getBelongingDevice = (entityId: string) => DeviceManager.instance.getDevice(entityId);
+
 export {
     Device,
     State,
@@ -75,5 +77,6 @@ export {
     sendMsg,
     getGeographicLocation,
     isUnavailableEntity,
-    getUnavailableEntities
+    getUnavailableEntities,
+    getBelongingDevice
 };
