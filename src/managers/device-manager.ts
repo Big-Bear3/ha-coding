@@ -1,7 +1,8 @@
 import type { Ref } from '../objects/ref';
-import { ref } from '../objects/ref.js';
+import { ref } from '../main.js';
 import { Device } from '../actions/create-device.js';
 import { StateManager } from './state-manager.js';
+import { cloneDeep } from 'lodash-es';
 
 export class DeviceManager {
     static #instance: DeviceManager;
@@ -10,7 +11,7 @@ export class DeviceManager {
 
     #deviceInstances = new Set<Device>();
 
-    #unavailableEntitiesRef = ref<string[]>([]);
+    #unavailableEntitiesRef: Ref<string[]>;
 
     private get devicesMap() {
         return this.#devicesMap;
@@ -41,22 +42,30 @@ export class DeviceManager {
     }
 
     setUnavailableEntity(entityId: string, isUnavailable: boolean): void {
+        if (!this.#unavailableEntitiesRef) this.#unavailableEntitiesRef = ref([]);
+
         const exsitedEntityIdIndex = this.#unavailableEntitiesRef.value.indexOf(entityId);
 
-        if (isUnavailable && exsitedEntityIdIndex === -1) {
-            this.#unavailableEntitiesRef.value.push(entityId);
-            this.#unavailableEntitiesRef.trigger();
+        if (isUnavailable) {
+            if (exsitedEntityIdIndex === -1) {
+                const unavailableEntitiesRefClone = cloneDeep(this.#unavailableEntitiesRef.value);
+                unavailableEntitiesRefClone.push(entityId);
+                this.#unavailableEntitiesRef.value = unavailableEntitiesRefClone;
+            }
         } else if (exsitedEntityIdIndex > -1) {
-            this.#unavailableEntitiesRef.value.splice(exsitedEntityIdIndex, 1);
-            this.#unavailableEntitiesRef.trigger();
+            const unavailableEntitiesRefClone = cloneDeep(this.#unavailableEntitiesRef.value);
+            unavailableEntitiesRefClone.splice(exsitedEntityIdIndex, 1);
+            this.#unavailableEntitiesRef.value = unavailableEntitiesRefClone;
         }
     }
 
     isUnavailableEntity(entityId: string): boolean {
-        return this.#unavailableEntitiesRef.value.indexOf(entityId) > -1;
+        if (!this.#unavailableEntitiesRef) this.#unavailableEntitiesRef = ref([]);
+        return this.#unavailableEntitiesRef.value.includes(entityId);
     }
 
     getUnavailableEntities(): Ref<string[]> {
+        if (!this.#unavailableEntitiesRef) this.#unavailableEntitiesRef = ref([]);
         return this.#unavailableEntitiesRef;
     }
 
