@@ -42,20 +42,34 @@ type MinutesOrSeconds = '00' | '01' | '02' | '03' | '04' | '05' | '06' | '07' | 
 export type TimeStr = `${Hours}:${MinutesOrSeconds}:${MinutesOrSeconds}`;
 
 export interface SunInfo {
-    dawn: TimeStr;
-    dusk: TimeStr;
-    goldenHour: TimeStr;
-    goldenHourEnd: TimeStr;
+    /** 正午夜时间 */
     nadir: TimeStr;
-    nauticalDawn: TimeStr;
-    nauticalDusk: TimeStr;
-    night: TimeStr;
+    /** 夜晚结束时间 (天即将开始亮) */
     nightEnd: TimeStr;
-    solarNoon: TimeStr;
+    /** 航海黎明时间 (天开始蒙蒙亮) */
+    nauticalDawn: TimeStr;
+    /** 黎明时间 */
+    dawn: TimeStr;
+    /** 日出时间 (太阳的顶部边缘和地平线相切) */
     sunrise: TimeStr;
+    /** 日出结束时间 (太阳的底部边缘和地平线相切) */
     sunriseEnd: TimeStr;
-    sunset: TimeStr;
+    /** 清晨金色太阳结束时间 */
+    goldenHourEnd: TimeStr;
+    /** 正午时间 */
+    solarNoon: TimeStr;
+    /** 傍晚太阳开始变成金色时间 */
+    goldenHour: TimeStr;
+    /** 日落开始时间 (太阳的底部边缘和地平线相切) */
     sunsetStart: TimeStr;
+    /** 日落时间 (太阳的顶部边缘和地平线相切) */
+    sunset: TimeStr;
+    /** 黄昏时间 */
+    dusk: TimeStr;
+    /** 航海黄昏时间 (天基本上黑了) */
+    nauticalDusk: TimeStr;
+    /** 夜晚开始时间 (天已经足够暗) */
+    night: TimeStr;
 }
 
 export interface HAEvent<A = any, S = any> {
