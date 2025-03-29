@@ -5,6 +5,7 @@ import { GEOGRAPHIC_LOCATION, HA_WEBSOCKET_ADDRESS } from '../config/config.js';
 import { AppService } from './app-service.js';
 import { EventService } from './event-service.js';
 import { customSubscribers } from '../actions/custom-subscribe.js';
+import { StateManager } from '../managers/state-manager.js';
 
 export class HAWebsocketService {
     static #instance: HAWebsocketService;
@@ -31,8 +32,8 @@ export class HAWebsocketService {
 
     private constructor() {}
 
-    createHAWebsocket(): Promise<void> {
-        return new Promise<void>((resolve) => {
+    createHAWebsocket(isReconnect?: boolean): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
             this.#ws = new WebSocket(HA_WEBSOCKET_ADDRESS);
 
             this.#ws.onopen = async (): Promise<void> => {
@@ -67,9 +68,14 @@ export class HAWebsocketService {
                                 if (msgData.id !== this.#subscribeEntitiesMsgId) return;
 
                                 if (msgData.event.a && !this.#haWebsocketReady) {
+                                    if (isReconnect) StateManager.instance.pauseActionExec();
+
                                     for (const [entityId, event] of Object.entries<HAEvent>(msgData.event.a)) {
                                         EventService.instance.handleEvent(entityId, event);
                                     }
+
+                                    if (isReconnect) StateManager.instance.resumeActionExec();
+
                                     this.#haWebsocketReady = true;
                                     resolve();
                                     return;
@@ -103,6 +109,10 @@ export class HAWebsocketService {
                         console.error(error);
                     }
                 };
+            };
+
+            this.#ws.onerror = (error) => {
+                reject(error);
             };
         });
     }
@@ -160,23 +170,31 @@ export class HAWebsocketService {
         clearTimeout(this.#reconnectTimeout);
 
         this.#reconnectTimeout = setTimeout(() => {
+            console.error('HA Coding 获取ws消息超时！');
+            this.#haWebsocketReady = false;
             this.reconnect();
         }, HAWebsocketService.#reconnectTimeoutTime);
     }
 
-    private reconnect(): void {
-        console.error('HA Coding 获取ws消息超时，正在重连...');
+    private async reconnect(): Promise<void> {
+        console.error('正在重连...');
 
         try {
             this.#ws.close();
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
 
         try {
-            this.createHAWebsocket();
+            await this.createHAWebsocket(true);
+            console.log('重连成功！');
         } catch (error) {
-            console.log(error);
+            console.error('重连失败，将在60秒后重试！');
+            console.error(error);
+
+            setTimeout(() => {
+                this.reconnect();
+            }, 60000);
         }
     }
 

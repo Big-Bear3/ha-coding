@@ -31,6 +31,8 @@ export class StateManager {
 
     readonly #refObjToPersistentKey = new WeakMap<Ref, string>();
 
+    private actionExecEnabled = true;
+
     private constructor() {}
 
     handleState(c: Class, key: ObjectKey, callInfoGetter?: CallInfoGetter, stateOptions?: StateOptions): void {
@@ -146,14 +148,16 @@ export class StateManager {
                     effectManager.setEffects({ c, instance: this, state: stateInfo.name, stateType: 'action' });
 
                     const actionFn = (...args: unknown[]) => {
-                        try {
-                            const res = stateInfo.originalActionFn.bind(this)(...args);
-                            effectManager.broadcast({
-                                effect: { c, instance: this, state: stateInfo.name, stateType: 'action' },
-                                value: res
-                            });
-                        } catch (error) {
-                            console.error(error);
+                        if (StateManager.instance.actionExecEnabled) {
+                            try {
+                                const res = stateInfo.originalActionFn.bind(this)(...args);
+                                effectManager.broadcast({
+                                    effect: { c, instance: this, state: stateInfo.name, stateType: 'action' },
+                                    value: res
+                                });
+                            } catch (error) {
+                                console.error(error);
+                            }
                         }
                     };
 
@@ -230,7 +234,7 @@ export class StateManager {
             const refPersistence = JSON.stringify({ value });
             localStorage.setItem(key, refPersistence);
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     }
 
@@ -243,7 +247,7 @@ export class StateManager {
             const refPersistenceObj = JSON.parse(refPersistence);
             return refPersistenceObj.value;
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
 
         return undefined;
@@ -267,6 +271,14 @@ export class StateManager {
                 deviceInstance[stateInfo.name] = persistentValue;
             }
         }
+    }
+
+    pauseActionExec(): void {
+        this.actionExecEnabled = false;
+    }
+
+    resumeActionExec(): void {
+        this.actionExecEnabled = true;
     }
 
     static get instance(): StateManager {
