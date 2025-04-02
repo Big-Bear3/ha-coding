@@ -1,14 +1,18 @@
-type ArrayIndexes<T extends any[], U extends any[] = []> =
-    | U['length']
-    | ([...U, any]['length'] extends T['length'] ? never : ArrayIndexes<T, [...U, any]>);
+type ElementType<T> = T extends (...args: any[]) => infer R ? R : T;
 
-type ValueOrReturnValue<T> = T extends (...args: any) => any ? ReturnType<T> : T;
+type MapArray<T> = T extends readonly (infer U)[] ? ElementType<U>[] : never;
 
-type MapToValueOrReturnValue<T extends readonly any[], U extends any[] = []> = T extends readonly [infer F, ...infer R]
-    ? MapToValueOrReturnValue<R, [...U, ValueOrReturnValue<F>]>
-    : U;
+type MapTuple<T extends readonly any[]> = {
+    [K in keyof T]: ElementType<T[K]>;
+} & { length: T['length'] };
 
-type CbStates<T> = T extends readonly any[] ? MapToValueOrReturnValue<T> : ValueOrReturnValue<T>;
+type CbStates<T> = T extends readonly any[]
+    ? number extends T['length']
+        ? MapArray<T>
+        : MapTuple<T>
+    : T extends (...args: any[]) => infer R
+    ? R
+    : T;
 
 export type Class<T = any> = new (...args: any[]) => T;
 
