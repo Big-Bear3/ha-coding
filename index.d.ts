@@ -14,6 +14,10 @@ type CbStates<T> = T extends readonly any[]
     ? R
     : T;
 
+type ArrayIndexes<T extends any[], U extends any[] = []> =
+    | U['length']
+    | ([...U, any]['length'] extends T['length'] ? never : ArrayIndexes<T, [...U, any]>);
+
 export type Class<T = any> = new (...args: any[]) => T;
 
 export type ObjectKey = string | symbol | number;
