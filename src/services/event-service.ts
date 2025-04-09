@@ -13,7 +13,9 @@ export class EventService {
             const device = deviceManager.getDevice(entityId);
             if (!device) return;
 
-            deviceManager.setUnavailableEntity(entityId, !!(event?.s === 'unavailable'));
+            const isUnavailable = event?.s === 'unavailable';
+            deviceManager.setUnavailableEntity(entityId, event?.s === 'unavailable');
+            if (isUnavailable) return;
 
             const callService = CallService.instance;
             callService.callable = false;
