@@ -23,6 +23,10 @@ export class DeviceManager {
         StateManager.instance.handlePersistentStates(device);
 
         for (const entityId of Object.values(device.$entityIds)) {
+            if (this.devicesMap.has(entityId)) {
+                console.warn('检测到了重复使用的实体ID: ' + entityId);
+            }
+
             this.devicesMap.set(entityId, device);
         }
 
