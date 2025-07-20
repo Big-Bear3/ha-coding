@@ -51,7 +51,11 @@ function inTimeRange(startTime: TimeStr, endTime: TimeStr): boolean {
     let end = timeStrToTimeMillis(endTime);
     if (end < start) end = end + 24 * 60 * 60 * 1000;
     const currentTimeMillis = new Date().getTime() - dayjs().startOf('day').valueOf();
-    return currentTimeMillis >= start && currentTimeMillis <= end;
+    const nextDayCurrentTimeMillis = currentTimeMillis + 24 * 60 * 60 * 1000;
+    return (
+        (currentTimeMillis >= start && currentTimeMillis <= end) ||
+        (nextDayCurrentTimeMillis >= start && nextDayCurrentTimeMillis <= end)
+    );
 }
 
 export {
