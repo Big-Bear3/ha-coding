@@ -99,3 +99,121 @@ describe('停止&恢复', () => {
         }, 619);
     }, 100);
 });
+
+describe('miss后应能重新触发', () => {
+    const light = new MiLight();
+    let flag = 0;
+
+    setTimeout(() => {
+        const { miss } = onKeep(
+            () => light.status > 2,
+            () => {
+                flag++;
+            },
+            200
+        );
+
+        light.status = 3;
+
+        setTimeout(() => {
+            miss();
+        }, 100);
+
+        setTimeout(() => {
+            light.status = 0;
+        }, 150);
+
+        setTimeout(() => {
+            light.status = 4;
+        }, 200);
+
+        setTimeout(() => {
+            assert.strictEqual(flag, 0);
+        }, 389);
+
+        setTimeout(() => {
+            assert.strictEqual(flag, 1);
+        }, 419);
+    }, 700);
+});
+
+describe('hit后应能重新触发', () => {
+    const light = new MiLight();
+    let flag = 0;
+
+    setTimeout(() => {
+        const { hit } = onKeep(
+            () => light.status > 2,
+            () => {
+                flag++;
+            },
+            200
+        );
+
+        light.status = 3;
+
+        setTimeout(() => {
+            hit();
+            assert.strictEqual(flag, 1);
+        }, 50);
+
+        setTimeout(() => {
+            light.status = 0;
+        }, 100);
+
+        setTimeout(() => {
+            light.status = 4;
+        }, 150);
+
+        setTimeout(() => {
+            assert.strictEqual(flag, 2);
+        }, 369);
+    }, 1200);
+});
+
+describe('生命周期', () => {
+    const light = new MiLight();
+    let matchCount = 0;
+    let breakCount = 0;
+
+    setTimeout(() => {
+        onKeep(
+            () => light.status > 2,
+            () => {},
+            200,
+            {
+                onMatch: () => {
+                    matchCount++;
+                },
+                onBreak: () => {
+                    breakCount++;
+                }
+            }
+        );
+
+        light.status = 3;
+
+        setTimeout(() => {
+            assert.strictEqual(matchCount, 1);
+            assert.strictEqual(breakCount, 0);
+        }, 10);
+
+        setTimeout(() => {
+            light.status = 0;
+        }, 50);
+
+        setTimeout(() => {
+            assert.strictEqual(matchCount, 1);
+            assert.strictEqual(breakCount, 1);
+        }, 60);
+
+        setTimeout(() => {
+            light.status = 5;
+        }, 100);
+
+        setTimeout(() => {
+            assert.strictEqual(matchCount, 2);
+            assert.strictEqual(breakCount, 1);
+        }, 110);
+    }, 1800);
+});

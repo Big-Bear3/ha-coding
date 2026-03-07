@@ -16,7 +16,7 @@ function isWeekend(date?: DateStr): boolean {
 
 function isWorkDay(date?: DateStr): boolean {
     const dateStr = date ?? dayjs().format('YYYY-MM-DD');
-    return (isWeekDay() && !HOLIDAYS.includes(dateStr)) || EXTRA_WORK_DAYS.includes(dateStr);
+    return (isWeekDay(date) && !HOLIDAYS.includes(dateStr)) || EXTRA_WORK_DAYS.includes(dateStr);
 }
 
 function isNotWorkDay(date?: DateStr): boolean {

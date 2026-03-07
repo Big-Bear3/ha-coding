@@ -57,9 +57,11 @@ export function onKeep(
         },
         miss: () => {
             clearTimeout(timeout);
+            timeout = null;
         },
         hit: () => {
             clearTimeout(timeout);
+            timeout = null;
             cb();
         }
     };

@@ -123,7 +123,7 @@ class Schedule {
                     break;
 
                 case 2:
-                    if (!task.repeatType.includes('THU')) return;
+                    if (!task.repeatType.includes('TUE')) return;
                     break;
 
                 case 3:

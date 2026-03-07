@@ -26,6 +26,8 @@ export class HAWebsocketService {
 
     #reconnectTimeout: NodeJS.Timeout;
 
+    #pingTimeout: NodeJS.Timeout;
+
     get newMsgId() {
         return ++this.#currentMsgId;
     }
@@ -114,6 +116,14 @@ export class HAWebsocketService {
             this.#ws.onerror = (error) => {
                 reject(error);
             };
+
+            this.#ws.onclose = () => {
+                if (this.#haWebsocketReady) {
+                    console.error('HA Coding ws连接已断开！');
+                    this.#haWebsocketReady = false;
+                    this.reconnect();
+                }
+            };
         });
     }
 
@@ -156,7 +166,8 @@ export class HAWebsocketService {
     }
 
     private timedPing(): void {
-        setTimeout(() => {
+        this.stopPing();
+        this.#pingTimeout = setTimeout(() => {
             const param = {
                 id: this.newMsgId,
                 type: 'ping'
@@ -164,6 +175,11 @@ export class HAWebsocketService {
             this.send(param);
             this.timedPing();
         }, HAWebsocketService.#pingInterval);
+    }
+
+    private stopPing(): void {
+        clearTimeout(this.#pingTimeout);
+        this.#pingTimeout = null;
     }
 
     private resetReceiveMsgTimeout(): void {
@@ -179,7 +195,11 @@ export class HAWebsocketService {
     private async reconnect(): Promise<void> {
         console.error('正在重连...');
 
+        this.stopPing();
+        clearTimeout(this.#reconnectTimeout);
+
         try {
+            this.#ws.onclose = null;
             this.#ws.close();
         } catch (error) {
             console.error(error);

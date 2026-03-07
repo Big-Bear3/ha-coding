@@ -19,8 +19,11 @@ export class EventService {
 
             const callService = CallService.instance;
             callService.callable = false;
-            device.$onEvent(event, entityId);
-            callService.callable = true;
+            try {
+                device.$onEvent(event, entityId);
+            } finally {
+                callService.callable = true;
+            }
         } catch (error) {
             console.error(error);
         }
