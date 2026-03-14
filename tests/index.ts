@@ -3,3 +3,4 @@ import './test-on-detect.js';
 import './test-on-keep.js';
 import './test-stage.js';
 import './test-persistence.js';
+import './test-on-switch.js';

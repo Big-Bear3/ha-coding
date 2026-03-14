@@ -136,6 +136,16 @@ export function onChange<T>(
     resume: () => void;
 };
 
+export function onSwitch<T>(
+    statesGetter: () => T,
+    from: T | '*' | '**',
+    to: T | '*' | '**',
+    cb: (states: CbStates<T>, oldStates: CbStates<T>) => void
+): {
+    pause: () => void;
+    resume: () => void;
+};
+
 export function onDetect<T>(
     statesGetter: () => T,
     cb: (states: CbStates<T>, historyStates: CbStates<T>[]) => void,

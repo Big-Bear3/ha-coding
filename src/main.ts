@@ -4,6 +4,7 @@ import { Action } from './decorators/action.js';
 import { onChange } from './actions/on-change.js';
 import { onDetect } from './actions/on-detect.js';
 import { onKeep } from './actions/on-keep.js';
+import { onSwitch } from './actions/on-switch.js';
 import { stage, step } from './actions/stage.js';
 import { Timer } from './actions/timer.js';
 import { delay } from './actions/delay.js';
@@ -51,6 +52,7 @@ export {
     onChange,
     onDetect,
     onKeep,
+    onSwitch,
     stage,
     step,
     Timer,
