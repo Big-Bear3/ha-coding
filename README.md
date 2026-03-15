@@ -165,7 +165,8 @@ onChange() 方法用于监听设备的状态变化，执行相关的逻辑。
 参数：
 - statesGetter - 用于指定需要监听的设备状态，可以同时监听多个设备的多个状态。
 - cb - 状态变化后调用的回调方法。
-- onChangeOptions - 指定 onChange() 方法的监听选项，immediate - 是否在调用 onChange() 方法后，立即执行一次回调方法。
+- onChangeOptions - 指定 onChange() 方法的监听选项：
+  - immediate - 是否在调用 onChange() 方法后，立即执行一次回调方法。
 
 返回值：
 - pause - 调用该方法以暂停监听
@@ -430,6 +431,72 @@ sendMsg() 方法用于向Home assistant Websocket发送自定义消息。
 function getUnavailableEntities(): Ref<string[]>;
 ```
 getUnavailableEntities() 方法用于获取在 Home Assistant 中不可用的设备（大概率是离线设备）。返回值是Ref包装的当前不可用的设备下的实体ID数组，可以被 onChange、onSwitch、onKeep 等监听。
+
+## logger
+```ts
+import { logger } from 'ha-coding';
+
+logger.info(...args: any[]): void;
+logger.warn(...args: any[]): void;
+logger.error(...args: any[]): void;
+logger.mark(desc: string): void;
+```
+logger 对象用于记录日志。所有日志会自动写入项目根目录下的 `logs/` 文件夹，日志文件按天自动轮转（文件名格式：`YYYY-MM-DD.log`）。
+
+方法：
+- info(...args) - 记录 INFO 级别日志。
+- warn(...args) - 记录 WARN 级别日志。
+- error(...args) - 记录 ERROR 级别日志。
+- mark(desc) - 在 onChange 或 onSwitch 的回调方法中调用，标记本次状态变化需要记录日志。框架会自动格式化输出状态变化详情（格式：`[onChange:描述] 类名.属性: 旧值 → 新值`）。只在 onChange/onSwitch 的 cb 同步执行期间有效。
+
+日志输出格式：
+```
+[2026-03-15 12:00:00] [INFO] 你的日志内容
+[2026-03-15 12:00:01] [WARN] 警告信息
+[2026-03-15 12:00:02] [ERROR] 错误信息
+[2026-03-15 12:00:03] [INFO] [onChange:卓生间人在感应] MiTrio.occupied: false → true
+```
+
+示例：
+```ts
+import { onChange, logger } from 'ha-coding';
+
+// 手动记录日志
+logger.info('卫生间灯已开启');
+logger.warn('传感器信号不稳定', sensorId);
+logger.error('设备控制失败', error);
+
+// 简单场景：cb 开头调用 mark，每次状态变化都记录
+onChange(
+    () => bathroom.occupySensor.occupied,
+    (occupied) => {
+        logger.mark('卫生间人在感应');
+        bathroom.lamp.on = occupied;
+    }
+);
+
+// 条件场景：在条件内调用 mark，只在匹配时记录
+onChange(
+    () => gateway.virtualEventOccur,
+    (eventName) => {
+        if (eventName === 'v-查询温度') {
+            logger.mark('查询温度');
+            xiaoaiPlayText(`当前温度${sensor.temperature}度`);
+        }
+    }
+);
+
+// 配合 onSwitch
+onSwitch(
+    () => light.on,
+    true,
+    false,
+    () => {
+        logger.mark('灯开关状态');
+        logger.info('灯被关闭，执行后续操作');
+    }
+);
+```
 
 ## 其他
 ```ts

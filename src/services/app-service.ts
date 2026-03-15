@@ -1,6 +1,7 @@
 import { startupCbs } from '../actions/life-cycle.js';
 import { getLoginInfo, getToken, login } from '../api/api-ha.js';
 import { HAWebsocketService } from './ha-websocket-service.js';
+import { logger } from './logger-service.js';
 
 export class AppService {
     static #instance: AppService;
@@ -33,18 +34,19 @@ export class AppService {
 export async function initHACoding(): Promise<void> {
     try {
         await import('../config/config.js');
+
         await HAWebsocketService.instance.createHAWebsocket();
 
-        console.log('HA Coding 启动成功！');
+        logger.print('HA Coding 启动成功！');
 
         for (const startupCb of startupCbs) {
             try {
                 startupCb();
             } catch (error) {
-                console.error(error);
+                logger.printError(error);
             }
         }
     } catch (error) {
-        console.error(error);
+        logger.printError(error);
     }
 }

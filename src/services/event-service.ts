@@ -1,6 +1,7 @@
 import type { HAEvent } from '../types/ha-types';
 import { DeviceManager } from '../managers/device-manager.js';
 import { CallService } from './call-service.js';
+import { logger } from './logger-service.js';
 
 export class EventService {
     static #instance: EventService;
@@ -25,7 +26,7 @@ export class EventService {
                 callService.callable = true;
             }
         } catch (error) {
-            console.error(error);
+            logger.printError(error);
         }
     }
 

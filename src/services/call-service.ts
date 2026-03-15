@@ -2,6 +2,7 @@ import { nextTick } from 'process';
 import type { HACallData } from '../types/ha-types';
 import { HAWebsocketService } from './ha-websocket-service.js';
 import { IMMEDIATE_CALL } from '../config/config.js';
+import { logger } from './logger-service.js';
 
 export interface CallInfo {
     entityId: string;
@@ -77,12 +78,17 @@ export class CallService {
             }
 
             for (const [callDataKey, callData] of callDataMap) {
+                const { entity_id, ...rest } = callData.service_data;
+                const hasExtra = Object.keys(rest).length > 0;
+                logger.info(
+                    `[call] ${callData.domain}.${callData.service} ${entity_id}${hasExtra ? ' ' + JSON.stringify(rest) : ''}`
+                );
                 haWebsocketService.send(callData);
             }
 
             this.#callingIsActivated = false;
         } catch (error) {
-            console.error(error);
+            logger.printError(error);
         }
     }
 

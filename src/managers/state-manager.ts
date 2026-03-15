@@ -6,6 +6,7 @@ import { CallInfoGetter, CallService } from '../services/call-service.js';
 import { EffectManager } from './effect-manager.js';
 import { localStorage } from '../utils/local-storage.js';
 import { DeviceManager } from './device-manager.js';
+import { logger } from '../services/logger-service.js';
 
 interface StateInfo {
     name: ObjectKey;
@@ -75,7 +76,7 @@ export class StateManager {
                             if (callInfo) callService.push(callInfo);
                         }
                     } catch (error) {
-                        console.error(error);
+                        logger.printError(error);
                     }
                 }
 
@@ -156,7 +157,7 @@ export class StateManager {
                                     value: res
                                 });
                             } catch (error) {
-                                console.error(error);
+                                logger.printError(error);
                             }
                         }
                     };
@@ -234,7 +235,7 @@ export class StateManager {
             const refPersistence = JSON.stringify({ value });
             localStorage.setItem(key, refPersistence);
         } catch (error) {
-            console.error(error);
+            logger.printError(error);
         }
     }
 
@@ -247,7 +248,7 @@ export class StateManager {
             const refPersistenceObj = JSON.parse(refPersistence);
             return refPersistenceObj.value;
         } catch (error) {
-            console.error(error);
+            logger.printError(error);
         }
 
         return undefined;

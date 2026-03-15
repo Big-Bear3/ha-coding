@@ -24,5 +24,5 @@ export function onSwitch<T>(
         if (fromMatched && toMatched) {
             cb(newVal, oldVal);
         }
-    });
+    }, { _logTag: 'onSwitch' });
 }

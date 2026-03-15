@@ -1,4 +1,5 @@
 import type { Class, ObjectKey, ObjectType } from '../types/types';
+import { logger } from '../services/logger-service.js';
 
 export interface Effect {
     c?: Class;
@@ -85,7 +86,7 @@ export class EffectManager {
                 try {
                     targetObserverInfo.observer();
                 } catch (error) {
-                    console.error(error);
+                    logger.printError(error);
                 }
             }
 

@@ -237,4 +237,14 @@ export function isUnavailableEntity(entityId: string): boolean;
 
 export function getUnavailableEntities(): Ref<string[]>;
 
+export const logger: {
+    info(...args: any[]): void;
+    warn(...args: any[]): void;
+    error(...args: any[]): void;
+    mark(desc: string): void;
+    print(...args: any[]): void;
+    printWarn(...args: any[]): void;
+    printError(...args: any[]): void;
+};
+
 export function getBelongingDevice(entityId: string): DeviceDef;

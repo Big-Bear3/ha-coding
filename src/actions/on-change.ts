@@ -2,16 +2,20 @@ import { cloneDeep } from 'lodash-es';
 import { EffectManager } from '../managers/effect-manager.js';
 import { StateManager } from '../managers/state-manager.js';
 import { nextTick } from 'process';
+import { setLogContext, clearLogContext } from '../services/logger-service.js';
 
 export function onChange<T>(
     statesGetter: () => T,
     cb: (states: any, oldStates: any) => void,
     onChangeOptions?: {
         immediate?: boolean;
+        _logTag?: string;
     }
 ) {
     const effectManager = EffectManager.instance;
     const stateManager = StateManager.instance;
+
+    const logTag = onChangeOptions?._logTag ?? 'onChange';
 
     effectManager.track();
     const originalStatesGetterRes = statesGetter();
@@ -35,7 +39,9 @@ export function onChange<T>(
         if (Array.isArray(statesGetterRes)) {
             const actionStateIndexes = replaceActionOfStatesGetterRes(statesGetterRes);
 
+            setLogContext({ tag: logTag, newVal: statesGetterRes, oldVal: oldStatesGetterRes });
             cb(statesGetterRes, oldStatesGetterRes);
+            clearLogContext();
 
             oldStatesGetterRes = cloneDeep(statesGetterRes);
             for (const actionStateIndex of actionStateIndexes) {
@@ -46,14 +52,20 @@ export function onChange<T>(
                 const actionInfo = stateManager.getActionInfoByActionFn(statesGetterRes as Function);
                 if (actionInfo) {
                     const effectValue = effectManager.getCurrentEffectValue(actionInfo.instance, actionInfo.name);
+                    setLogContext({ tag: logTag, newVal: effectValue?.value, oldVal: undefined });
                     cb(effectValue?.value, undefined);
+                    clearLogContext();
                     oldStatesGetterRes = undefined;
                 } else {
+                    setLogContext({ tag: logTag, newVal: statesGetterRes, oldVal: oldStatesGetterRes });
                     cb(statesGetterRes, oldStatesGetterRes);
+                    clearLogContext();
                     oldStatesGetterRes = statesGetterRes;
                 }
             } else {
+                setLogContext({ tag: logTag, newVal: statesGetterRes, oldVal: oldStatesGetterRes });
                 cb(statesGetterRes, oldStatesGetterRes);
+                clearLogContext();
                 oldStatesGetterRes = cloneDeep(statesGetterRes);
             }
         }

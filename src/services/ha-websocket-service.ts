@@ -6,6 +6,7 @@ import { AppService } from './app-service.js';
 import { EventService } from './event-service.js';
 import { customSubscribers } from '../actions/custom-subscribe.js';
 import { StateManager } from '../managers/state-manager.js';
+import { logger } from './logger-service.js';
 
 export class HAWebsocketService {
     static #instance: HAWebsocketService;
@@ -56,7 +57,7 @@ export class HAWebsocketService {
                                 const res = customSubscriber(msgData);
                                 if (res === false) return;
                             } catch (error) {
-                                console.error(error);
+                                logger.printError(error);
                             }
                         }
 
@@ -108,7 +109,7 @@ export class HAWebsocketService {
                                 }
                         }
                     } catch (error) {
-                        console.error(error);
+                        logger.printError(error);
                     }
                 };
             };
@@ -119,7 +120,7 @@ export class HAWebsocketService {
 
             this.#ws.onclose = () => {
                 if (this.#haWebsocketReady) {
-                    console.error('HA Coding ws连接已断开！');
+                    logger.printError('HA Coding ws连接已断开！');
                     this.#haWebsocketReady = false;
                     this.reconnect();
                 }
@@ -186,14 +187,14 @@ export class HAWebsocketService {
         clearTimeout(this.#reconnectTimeout);
 
         this.#reconnectTimeout = setTimeout(() => {
-            console.error('HA Coding 获取ws消息超时！');
+            logger.printError('HA Coding 获取ws消息超时！');
             this.#haWebsocketReady = false;
             this.reconnect();
         }, HAWebsocketService.#reconnectTimeoutTime);
     }
 
     private async reconnect(): Promise<void> {
-        console.error('正在重连...');
+        logger.printError('正在重连...');
 
         this.stopPing();
         clearTimeout(this.#reconnectTimeout);
@@ -202,15 +203,15 @@ export class HAWebsocketService {
             this.#ws.onclose = null;
             this.#ws.close();
         } catch (error) {
-            console.error(error);
+            logger.printError(error);
         }
 
         try {
             await this.createHAWebsocket(true);
-            console.log('重连成功！');
+            logger.print('重连成功！');
         } catch (error) {
-            console.error('重连失败，将在60秒后重试！');
-            console.error(error);
+            logger.printError('重连失败，将在60秒后重试！');
+            logger.printError(error);
 
             setTimeout(() => {
                 this.reconnect();

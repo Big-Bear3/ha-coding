@@ -32,6 +32,7 @@ import { customSubscribe, removeCustomSubscribe } from './actions/custom-subscri
 import type { ObjectType } from './types/types';
 import { GEOGRAPHIC_LOCATION } from './config/config.js';
 import { DeviceManager } from './managers/device-manager.js';
+import { logger } from './services/logger-service.js';
 
 const call = (callInfo: CallInfo) => CallService.instance.push(callInfo);
 
@@ -80,5 +81,6 @@ export {
     getGeographicLocation,
     isUnavailableEntity,
     getUnavailableEntities,
-    getBelongingDevice
+    getBelongingDevice,
+    logger
 };
