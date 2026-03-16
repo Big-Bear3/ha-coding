@@ -49,17 +49,17 @@ export class DeviceManager {
     setUnavailableEntity(entityId: string, isUnavailable: boolean): void {
         if (!this.#unavailableEntitiesRef) this.#unavailableEntitiesRef = ref([]);
 
-        const exsitedEntityIdIndex = this.#unavailableEntitiesRef.value.indexOf(entityId);
+        const existedEntityIdIndex = this.#unavailableEntitiesRef.value.indexOf(entityId);
 
         if (isUnavailable) {
-            if (exsitedEntityIdIndex === -1) {
+            if (existedEntityIdIndex === -1) {
                 const unavailableEntitiesRefClone = cloneDeep(this.#unavailableEntitiesRef.value);
                 unavailableEntitiesRefClone.push(entityId);
                 this.#unavailableEntitiesRef.value = unavailableEntitiesRefClone;
             }
-        } else if (exsitedEntityIdIndex > -1) {
+        } else if (existedEntityIdIndex > -1) {
             const unavailableEntitiesRefClone = cloneDeep(this.#unavailableEntitiesRef.value);
-            unavailableEntitiesRefClone.splice(exsitedEntityIdIndex, 1);
+            unavailableEntitiesRefClone.splice(existedEntityIdIndex, 1);
             this.#unavailableEntitiesRef.value = unavailableEntitiesRefClone;
         }
     }

@@ -13,7 +13,7 @@ import { ref } from './objects/ref.js';
 import {
     cloneDeep,
     isEqual,
-    isWeekDay,
+    isWeekday,
     isWeekend,
     isWorkDay,
     isNotWorkDay,
@@ -36,7 +36,7 @@ import { logger } from './services/logger-service.js';
 
 const call = (callInfo: CallInfo) => CallService.instance.push(callInfo);
 
-const sendMsg = (msg: string | ObjectType) => HAWebsocketService.instance.send(msg);
+const sendMessage = (msg: string | ObjectType) => HAWebsocketService.instance.send(msg);
 
 const getGeographicLocation = () => GEOGRAPHIC_LOCATION;
 
@@ -62,7 +62,7 @@ export {
     ref,
     cloneDeep,
     isEqual,
-    isWeekDay,
+    isWeekday,
     isWeekend,
     isWorkDay,
     isNotWorkDay,
@@ -77,7 +77,7 @@ export {
     sendNotification,
     customSubscribe,
     removeCustomSubscribe,
-    sendMsg,
+    sendMessage,
     getGeographicLocation,
     isUnavailableEntity,
     getUnavailableEntities,

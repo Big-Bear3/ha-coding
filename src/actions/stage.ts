@@ -30,7 +30,7 @@ export function stage(...steps: Parameters<typeof onChange>[]) {
             onChangeOperations[currentStepIndex].resume();
         } else {
             const [statesGetter, cb, onChangeOptions] = steps[currentStepIndex];
-            const { pause, resume } = onChange(statesGetter, (...args: Parameters<typeof cb>) => cb(...args), onChangeOptions);
+            const { pause, resume } = onChange(statesGetter, (...args: Parameters<typeof cb>) => cb(...args), { ...onChangeOptions, _logTag: `stage(${currentStepIndex})` });
             onChangeOperations[currentStepIndex] = { pause, resume };
         }
     };

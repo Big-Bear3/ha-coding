@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
 import type { DateStr, RepeatType, TimeStr } from '../types/types';
-import { isWeekDay, isWeekend, isWorkDay, isNotWorkDay } from '../utils/app-utils.js';
+import { isWeekday, isWeekend, isWorkDay, isNotWorkDay } from '../utils/app-utils.js';
 import { timeStrToTimeMillis } from '../utils/date-time-utils.js';
+import { setLogContext, clearLogContext } from '../services/logger-service.js';
 
 interface ScheduleTask {
     taskId: number;
@@ -95,7 +96,7 @@ class Schedule {
                     break;
 
                 case 'WEEK_DAY':
-                    if (!isWeekDay()) return;
+                    if (!isWeekday()) return;
                     break;
 
                 case 'WEEKEND':
@@ -159,14 +160,22 @@ class Schedule {
 
             if (delayTime < Schedule.clockMaxFastTime + 10000) {
                 setTimeout(() => {
-                    if (task.isValid) task.cb();
+                    if (task.isValid) {
+                        setLogContext({ tag: 'schedule' });
+                        task.cb();
+                        clearLogContext();
+                    }
                 }, delayTime);
             } else {
                 setTimeout(() => {
                     const innerDelayTime = this.getDelayTime(taskTimeItem, new Date().getTime());
 
                     setTimeout(() => {
-                        if (task.isValid) task.cb();
+                        if (task.isValid) {
+                            setLogContext({ tag: 'schedule' });
+                            task.cb();
+                            clearLogContext();
+                        }
                     }, innerDelayTime);
                 }, delayTime - Schedule.clockMaxFastTime);
             }

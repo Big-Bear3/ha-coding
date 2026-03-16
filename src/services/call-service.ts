@@ -8,7 +8,7 @@ export interface CallInfo {
     entityId: string;
     service: string;
     serviceData?: Record<string, any>;
-    unmergable?: boolean;
+    unmergeable?: boolean;
 }
 
 export type CallInfoGetter = (value: any) => CallInfo | Promise<CallInfo>;
@@ -65,7 +65,7 @@ export class CallService {
                     },
                     type: 'call_service'
                 };
-                if (callInfo.unmergable) {
+                if (callInfo.unmergeable) {
                     callDataMap.set(callData.id, callData);
                 } else {
                     const targetCallData = callDataMap.get(callInfo.entityId + '##' + callInfo.service);

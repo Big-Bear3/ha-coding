@@ -100,12 +100,12 @@ describe('停止&恢复', () => {
     }, 100);
 });
 
-describe('miss后应能重新触发', () => {
+describe('skip后应能重新触发', () => {
     const light = new MiLight();
     let flag = 0;
 
     setTimeout(() => {
-        const { miss } = onKeep(
+        const { skip } = onKeep(
             () => light.status > 2,
             () => {
                 flag++;
@@ -116,7 +116,7 @@ describe('miss后应能重新触发', () => {
         light.status = 3;
 
         setTimeout(() => {
-            miss();
+            skip();
         }, 100);
 
         setTimeout(() => {

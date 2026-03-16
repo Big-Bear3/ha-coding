@@ -1,11 +1,12 @@
 import { nextTick } from 'process';
 import { Effect, EffectManager } from '../managers/effect-manager.js';
+import { setLogContext, clearLogContext } from '../services/logger-service.js';
 
 export function onKeep(
-    statesJudger: () => boolean,
+    statesPredicate: () => boolean,
     cb: () => void,
     keepTime?: number,
-    lifeCycle?: { onMatch?: () => void; onBreak?: () => void }
+    lifecycle?: { onMatch?: () => void; onBreak?: () => void }
 ) {
     const effectManager = EffectManager.instance;
 
@@ -15,22 +16,32 @@ export function onKeep(
 
     const handledCb = () => {
         effectManager.track();
-        const res = statesJudger();
+        const res = statesPredicate();
         currentEffects = effectManager.reap();
 
         if (res) {
             if (timeout) return;
 
             timeout = setTimeout(() => {
+                setLogContext({ tag: 'onKeep' });
                 cb();
+                clearLogContext();
             }, keepTime ?? 0);
 
-            if (lifeCycle?.onMatch) lifeCycle.onMatch();
+            if (lifecycle?.onMatch) {
+                setLogContext({ tag: 'onKeep(onMatch)' });
+                lifecycle.onMatch();
+                clearLogContext();
+            }
         } else {
             clearTimeout(timeout);
             timeout = null;
 
-            if (lifeCycle?.onBreak) lifeCycle.onBreak();
+            if (lifecycle?.onBreak) {
+                setLogContext({ tag: 'onKeep(onBreak)' });
+                lifecycle.onBreak();
+                clearLogContext();
+            }
         }
 
         if (observerId) {
@@ -55,14 +66,16 @@ export function onKeep(
             handledCb();
             effectManager.addObserver(currentEffects, handledCb, observerId);
         },
-        miss: () => {
+        skip: () => {
             clearTimeout(timeout);
             timeout = null;
         },
         hit: () => {
             clearTimeout(timeout);
             timeout = null;
+            setLogContext({ tag: 'onKeep(hit)' });
             cb();
+            clearLogContext();
         }
     };
 }

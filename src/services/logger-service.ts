@@ -52,7 +52,11 @@ class LoggerService {
 
     mark(desc: string): void {/*  */
         if (!currentLogContext) return;
-        this.info(`[${currentLogContext.tag}:${desc}] ${formatValue(currentLogContext.oldVal)} → ${formatValue(currentLogContext.newVal)}`);
+        const { tag, oldVal, newVal } = currentLogContext;
+        const detail = oldVal !== undefined || newVal !== undefined
+            ? ` ${formatValue(oldVal)} → ${formatValue(newVal)}`
+            : '';
+        this.info(`[${tag}:${desc}]${detail}`);
     }
 
     private log(level: LogLevel, toConsole: boolean, ...args: any[]): void {
@@ -144,8 +148,8 @@ function shortenPath(rawPath: string): string {
 
 interface LogContext {
     tag: string;
-    newVal: unknown;
-    oldVal: unknown;
+    newVal?: unknown;
+    oldVal?: unknown;
 }
 
 let currentLogContext: LogContext = null;

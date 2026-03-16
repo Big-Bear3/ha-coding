@@ -5,18 +5,18 @@ import { cloneDeep, isEqual } from 'lodash-es';
 import { EXTRA_WORK_DAYS, GEOGRAPHIC_LOCATION, HOLIDAYS } from '../config/config.js';
 import { timeStrToTimeMillis } from './date-time-utils.js';
 
-function isWeekDay(date?: DateStr): boolean {
+function isWeekday(date?: DateStr): boolean {
     const dateOfWeek = date ? dayjs(date).day() : dayjs().day();
     return dateOfWeek > 0 && dateOfWeek < 6;
 }
 
 function isWeekend(date?: DateStr): boolean {
-    return !isWeekDay(date);
+    return !isWeekday(date);
 }
 
 function isWorkDay(date?: DateStr): boolean {
     const dateStr = date ?? dayjs().format('YYYY-MM-DD');
-    return (isWeekDay(date) && !HOLIDAYS.includes(dateStr)) || EXTRA_WORK_DAYS.includes(dateStr);
+    return (isWeekday(date) && !HOLIDAYS.includes(dateStr)) || EXTRA_WORK_DAYS.includes(dateStr);
 }
 
 function isNotWorkDay(date?: DateStr): boolean {
@@ -61,7 +61,7 @@ function inTimeRange(startTime: TimeStr, endTime: TimeStr): boolean {
 export {
     cloneDeep,
     isEqual,
-    isWeekDay,
+    isWeekday,
     isWeekend,
     isWorkDay,
     isNotWorkDay,

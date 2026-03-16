@@ -102,7 +102,7 @@ export interface CallInfo {
     entityId: string;
     service: string;
     serviceData?: Record<string, any>;
-    unmergable?: boolean;
+    unmergeable?: boolean;
 }
 
 export type CallInfoGetter = (value: any) => CallInfo | Promise<CallInfo>;
@@ -149,7 +149,7 @@ export function onSwitch<T>(
 export function onDetect<T>(
     statesGetter: () => T,
     cb: (states: CbStates<T>, historyStates: CbStates<T>[]) => void,
-    periodTime: number
+    period: number
 ): {
     pause: () => void;
     resume: () => void;
@@ -157,14 +157,14 @@ export function onDetect<T>(
 };
 
 export function onKeep(
-    statesJudger: () => boolean,
+    statesPredicate: () => boolean,
     cb: () => void,
     keepTime?: number,
-    lifeCycle?: { onMatch?: () => void; onBreak?: () => void }
+    lifecycle?: { onMatch?: () => void; onBreak?: () => void }
 ): {
     stop: () => void;
     resume: () => void;
-    miss: () => void;
+    skip: () => void;
     hit: () => void;
 };
 
@@ -183,7 +183,7 @@ export function step<T>(...args: Parameters<typeof onChange<T>>): Parameters<typ
 
 export class Timer {
     constructor();
-    timing: (cb: () => void, time: number) => () => void;
+    after: (cb: () => void, time: number) => () => void;
     cancel: () => void;
 }
 
@@ -200,7 +200,7 @@ export function ref<T>(value?: T): Ref<T>;
 export function cloneDeep<T>(value: T): T;
 export function isEqual(value: any, other: any): boolean;
 
-export function isWeekDay(date?: DateStr): boolean;
+export function isWeekday(date?: DateStr): boolean;
 export function isWeekend(date?: DateStr): boolean;
 export function isWorkDay(date?: DateStr): boolean;
 export function isNotWorkDay(date?: DateStr): boolean;
@@ -229,7 +229,7 @@ export function customSubscribe(cb: (msgData: ObjectType) => boolean): number;
 
 export function removeCustomSubscribe(customSubscribeId: number): void;
 
-export function sendMsg(msg: string | ObjectType): void;
+export function sendMessage(msg: string | ObjectType): void;
 
 export function getGeographicLocation(): [number, number, number];
 

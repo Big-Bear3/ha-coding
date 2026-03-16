@@ -1,6 +1,6 @@
 import { onChange } from './on-change.js';
 
-export function onDetect<T>(statesGetter: () => T, cb: (states: any, historyStates: any[]) => void, periodTime: number) {
+export function onDetect<T>(statesGetter: () => T, cb: (states: any, historyStates: any[]) => void, period: number) {
     let callTime = new Date().getTime();
 
     const historyStates: any[] = [];
@@ -10,13 +10,13 @@ export function onDetect<T>(statesGetter: () => T, cb: (states: any, historyStat
         if (callTime) {
             const distanceFromCallTime = new Date().getTime() - callTime;
 
-            if (distanceFromCallTime <= periodTime) {
+            if (distanceFromCallTime <= period) {
                 historyStates.push(oldStates);
 
                 const timeout = setTimeout(() => {
                     historyStates.shift();
                     timeouts.shift();
-                }, periodTime - distanceFromCallTime);
+                }, period - distanceFromCallTime);
                 timeouts.push(timeout);
             }
 
@@ -27,14 +27,14 @@ export function onDetect<T>(statesGetter: () => T, cb: (states: any, historyStat
             const timeout = setTimeout(() => {
                 historyStates.shift();
                 timeouts.shift();
-            }, periodTime);
+            }, period);
             timeouts.push(timeout);
         }
 
         cb(states, historyStates);
     };
 
-    const { pause: onChangePause, resume: onChangeResume } = onChange(statesGetter, onChangeCb);
+    const { pause: onChangePause, resume: onChangeResume } = onChange(statesGetter, onChangeCb, { _logTag: 'onDetect' });
 
     return {
         pause: () => {
