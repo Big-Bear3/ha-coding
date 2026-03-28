@@ -1,12 +1,8 @@
-const configPathExternal = '../../../../config.js';
-const configPathInternal = '../../config.js';
-let configModule: any;
+import { pathToFileURL } from 'url';
+import { join } from 'path';
 
-try {
-    configModule = await import(configPathExternal);
-} catch (error) {
-    configModule = await import(configPathInternal);
-}
+const configPath = pathToFileURL(join(process.cwd(), 'config.js')).href;
+const configModule: any = await import(configPath);
 
 const config = configModule.default;
 
