@@ -16,7 +16,7 @@
         "build": "tsc --sourceMap false --outDir .dist && copy index.js .dist && copy index.d.ts .dist && copy config.js .dist && copy package.json .dist && copy LICENSE .dist && copy README.md .dist && rd /s /q .dist\\tests",
         "build-for-debug": "tsc --outDir .dist && copy index.js .dist && copy config.js .dist",
         "start": "tsc --outDir .dist && copy index.js .dist && copy config.js .dist && node .dist/index.js",
-        "test": "tsc --outDir .dist && copy index.js .dist && copy config.js .dist && cd .dist/tests && node index.js"
+        "test": "tsc --outDir .dist && copy index.js .dist && copy config.js .dist && node .dist/tests/index.js"
     },
     "author": "qm",
     "license": "MIT",
