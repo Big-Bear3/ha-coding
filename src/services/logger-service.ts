@@ -108,6 +108,7 @@ export const logger = LoggerService.instance;
 export function formatValue(value: any): string {
     if (value === undefined) return 'undefined';
     if (value === null) return 'null';
+    if (value instanceof Error) return value.stack || value.message || String(value);
     if (typeof value === 'object') {
         try {
             return JSON.stringify(value);
