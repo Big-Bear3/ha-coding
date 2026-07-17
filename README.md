@@ -376,13 +376,28 @@ function State(callInfoGetter: CallInfoGetter, stateOptions: StateOptions): Prop
 @State() 装饰器装饰的变量会变为响应式变量，可以被 onChange()、onSwitch()、onKeep() 等方法监听。
 参数：
 - callInfoGetter - 返回CallInfo对象，告知系统如何向 Home Assistant 发送报文以更新设备状态。
-- stateOptions - 目前内部仅有一个属性 persistentKeyGetter，该属性是方法类型，如果你需要持久化这个 state 成员变量，可以设置该方法，并返回一个唯一的key，每次值变化时，系统将用这个 key 作为键将其持久化 (保存到磁盘上)。下次系统启动时，系统会根据这个 key，取回持久化的值赋值给该成员变量。取回的值的优先级大于为其赋的初始值。
+- stateOptions
+  - persistentKeyGetter - 返回持久化状态使用的唯一 key。状态变化时会保存到磁盘，下次启动时恢复的值优先于成员变量的初始值。
 
 ## @Action()
 ```ts
 function Action(): MethodDecorator;
 ```
 @Action() 装饰器用于装饰设备的无状态事件（如：无线开关的单击事件）的方法，该方法被调用时，可以被 onChange()、onSwitch()、onKeep() 等方法监听到。
+
+被装饰方法的返回值会原样返回调用方。方法返回 `Promise` 或其他 `PromiseLike` 对象时，成功结果会在完成后传递给监听回调，回调参数类型为 `Awaited<ReturnType>`；失败时不触发监听回调，原返回值仍保持失败状态。
+
+例如，门铃事件需要先异步完成人脸识别，再把识别结果交给自动化：
+```ts
+@Action()
+async visitorDetected(imageUrl: string): Promise<Visitor> {
+    return faceRecognitionService.identify(imageUrl);
+}
+
+onChange(() => doorbell.visitorDetected, (visitor) => {
+    // visitor 的类型是 Visitor
+});
+```
 
 ## ref()
 ```ts
@@ -408,6 +423,27 @@ createDevice<T extends Class<DeviceDef>>(
 ): InstanceType<T>;
 ```
 createDevice() 方法用于创建设备的实例。具体用法可以参考[创建设备实例章节](#createDevice)。
+
+## createExternalDevice()
+```ts
+createExternalDevice<T extends Class<ExternalDeviceDef>>(
+    deviceDef: T,
+    ...cps: ConstructorParameters<T>
+): InstanceType<T>;
+```
+createExternalDevice() 用于创建不由 Home Assistant 实体驱动的设备，例如直接连接云 API、局域网协议或 TCP 设备的集成。设备会正式注册到 HA Coding，`@State`、`@Action`、状态持久化以及 onChange()、onKeep() 等监听能力均可正常使用。
+
+```ts
+@Device()
+class CloudAirConditioner implements ExternalDeviceDef {
+    @State()
+    on = false;
+}
+
+const airConditioner = createExternalDevice(CloudAirConditioner);
+```
+
+外部设备的接入代码负责同步状态和执行控制，因此不需要 `$entityIds` 与 `$onEvent`。接入代码可以使用 onChange() 监听设备状态，并把控制转交给云 API、局域网协议或 TCP 服务。
 
 ## onStartup()
 ```ts

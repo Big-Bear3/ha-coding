@@ -1,4 +1,4 @@
-type ElementType<T> = T extends (...args: any[]) => infer R ? R : T;
+type ElementType<T> = T extends (...args: any[]) => infer R ? Awaited<R> : T;
 
 type MapArray<T> = T extends readonly (infer U)[] ? ElementType<U>[] : never;
 
@@ -11,7 +11,7 @@ type CbStates<T> = T extends readonly any[]
         ? MapArray<T>
         : MapTuple<T>
     : T extends (...args: any[]) => infer R
-    ? R
+    ? Awaited<R>
     : T;
 
 type ArrayIndexes<T extends any[], U extends any[] = []> =
@@ -97,6 +97,9 @@ export interface DeviceDef {
     $entityIds: Record<string, string>;
     $onEvent(haEvent: HAEvent, entityId: string): void;
 }
+
+/** 由外部协议或服务直接驱动、不映射 Home Assistant 实体的设备定义。 */
+export interface ExternalDeviceDef {}
 
 export interface CallInfo {
     entityId: string;
@@ -216,6 +219,11 @@ export function initHACoding(): Promise<void>;
 export function createDevice<T extends Class<DeviceDef>>(
     deviceDef: T,
     entityIds: InstanceType<T>['$entityIds'],
+    ...cps: ConstructorParameters<T>
+): InstanceType<T>;
+
+export function createExternalDevice<T extends Class<ExternalDeviceDef>>(
+    deviceDef: T,
     ...cps: ConstructorParameters<T>
 ): InstanceType<T>;
 

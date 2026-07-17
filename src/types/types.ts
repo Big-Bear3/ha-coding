@@ -17,6 +17,9 @@ export interface DeviceDef {
     $onEvent(haEvent: HAEvent, entityId: string): void;
 }
 
+/** 由外部协议或服务直接驱动、不映射 Home Assistant 实体的设备定义。 */
+export interface ExternalDeviceDef {}
+
 export type WEEK = 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI' | 'SAT' | 'SUN';
 
 export type RepeatType =

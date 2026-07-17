@@ -1,6 +1,6 @@
 import type { Ref } from '../objects/ref';
 import { ref } from '../main.js';
-import { Device } from '../actions/create-device.js';
+import type { Device, ExternalDevice } from '../actions/create-device.js';
 import { StateManager } from './state-manager.js';
 import { cloneDeep } from 'lodash-es';
 import { logger } from '../services/logger-service.js';
@@ -10,7 +10,7 @@ export class DeviceManager {
 
     #devicesMap = new Map<string, Device>();
 
-    #deviceInstances = new Set<Device>();
+    #deviceInstances = new Set<Device | ExternalDevice>();
 
     #unavailableEntitiesRef: Ref<string[]>;
 
@@ -20,8 +20,12 @@ export class DeviceManager {
 
     private constructor() {}
 
+    registerExternalDevice(device: ExternalDevice): void {
+        this.registerDeviceInstance(device);
+    }
+
     registerDevice(device: Device): void {
-        StateManager.instance.handlePersistentStates(device);
+        this.registerDeviceInstance(device);
 
         for (const entityId of Object.values(device.$entityIds)) {
             if (this.devicesMap.has(entityId)) {
@@ -30,15 +34,13 @@ export class DeviceManager {
 
             this.devicesMap.set(entityId, device);
         }
-
-        this.#deviceInstances.add(device);
     }
 
     hasDevice(entityId: string): boolean {
         return this.devicesMap.has(entityId);
     }
 
-    hasDeviceInstance(device: Device): boolean {
+    hasDeviceInstance(device: Device | ExternalDevice): boolean {
         return this.#deviceInstances.has(device);
     }
 
@@ -72,6 +74,11 @@ export class DeviceManager {
     getUnavailableEntities(): Ref<string[]> {
         if (!this.#unavailableEntitiesRef) this.#unavailableEntitiesRef = ref([]);
         return this.#unavailableEntitiesRef;
+    }
+
+    private registerDeviceInstance(device: Device | ExternalDevice): void {
+        StateManager.instance.handlePersistentStates(device);
+        this.#deviceInstances.add(device);
     }
 
     static get instance(): DeviceManager {

@@ -23,7 +23,7 @@ import {
     inTimeRange
 } from './utils/app-utils.js';
 import { initHACoding } from './services/app-service.js';
-import { createDevice } from './actions/create-device.js';
+import { createDevice, createExternalDevice } from './actions/create-device.js';
 import { onStartup } from './actions/life-cycle.js';
 import { CallInfo, CallService } from './services/call-service.js';
 import { sendNotification } from './actions/send-notification.js';
@@ -72,6 +72,7 @@ export {
     inTimeRange,
     initHACoding,
     createDevice,
+    createExternalDevice,
     onStartup,
     call,
     sendNotification,

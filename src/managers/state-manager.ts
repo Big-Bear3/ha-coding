@@ -59,7 +59,7 @@ export class StateManager {
                 StateManager.instance.setStateValue(this, key, value);
 
                 if (stateOptions?.persistentKeyGetter && DeviceManager.instance.hasDeviceInstance(this)) {
-                    const persistentKey = stateOptions.persistentKeyGetter.bind(this)(this.$entityIds);
+                    const persistentKey = stateOptions.persistentKeyGetter.bind(this)(this.$entityIds ?? {});
                     if (persistentKey) StateManager.instance.setPersistentValue(persistentKey, value);
                 }
 
@@ -151,11 +151,24 @@ export class StateManager {
                     const actionFn = (...args: unknown[]) => {
                         if (StateManager.instance.actionExecEnabled) {
                             try {
-                                const res = stateInfo.originalActionFn.bind(this)(...args);
-                                effectManager.broadcast({
-                                    effect: { c, instance: this, state: stateInfo.name, stateType: 'action' },
-                                    value: res
-                                });
+                                const actionResult = stateInfo.originalActionFn.bind(this)(...args);
+                                const actionEffect = {
+                                    c,
+                                    instance: this,
+                                    state: stateInfo.name,
+                                    stateType: 'action'
+                                } as const;
+
+                                if (isPromiseLike(actionResult)) {
+                                    void Promise.resolve(actionResult).then(
+                                        (value) => effectManager.broadcast({ effect: actionEffect, value }),
+                                        (error) => logger.printError(error)
+                                    );
+                                } else {
+                                    effectManager.broadcast({ effect: actionEffect, value: actionResult });
+                                }
+
+                                return actionResult;
                             } catch (error) {
                                 logger.printError(error);
                             }
@@ -261,7 +274,7 @@ export class StateManager {
             const persistentKeyGetter = stateInfo?.stateOptions?.persistentKeyGetter;
             if (!persistentKeyGetter) continue;
 
-            const persistentKey = persistentKeyGetter.bind(deviceInstance)(deviceInstance.$entityIds);
+            const persistentKey = persistentKeyGetter.bind(deviceInstance)(deviceInstance.$entityIds ?? {});
             if (!persistentKey) continue;
 
             const persistentValue = this.getPersistentValue(persistentKey);
@@ -286,4 +299,12 @@ export class StateManager {
         if (!StateManager.#instance) StateManager.#instance = new StateManager();
         return StateManager.#instance;
     }
+}
+
+function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
+    return (
+        value !== null &&
+        (typeof value === 'object' || typeof value === 'function') &&
+        typeof (value as PromiseLike<unknown>).then === 'function'
+    );
 }
