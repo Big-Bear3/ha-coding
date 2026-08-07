@@ -119,7 +119,7 @@ export interface NotificationInfo {
     content: string;
 }
 
-export function Device(): ClassDecorator;
+export function Device(options?: { miGatewayDirect?: boolean }): ClassDecorator;
 
 export function State(): PropertyDecorator;
 export function State(callInfoGetter: CallInfoGetter): PropertyDecorator;
@@ -256,3 +256,5 @@ export const logger: {
 };
 
 export function getBelongingDevice(entityId: string): DeviceDef;
+
+export function miLogin(): Promise<void>;

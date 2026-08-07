@@ -1,6 +1,5 @@
 import { nextTick } from 'process';
-import type { HACallData } from '../types/ha-types';
-import { HAWebsocketService } from './ha-websocket-service.js';
+import { MiRouter } from './mi/mi-router.js';
 import { IMMEDIATE_CALL } from '../config/config.js';
 import { logger } from './logger-service.js';
 
@@ -50,55 +49,43 @@ export class CallService {
 
     call(): void {
         try {
-            const haWebsocketService = HAWebsocketService.instance;
-            const callDataMap = new Map<string | number, HACallData>();
+            const router = MiRouter.instance;
+            const callInfoMap = new Map<string, CallInfo>();
+            let unmergeableIndex = 0;
+
             while (this.#callingQueue.length > 0) {
                 const callInfo = this.#callingQueue.shift();
-                const callData: HACallData = {
-                    id: haWebsocketService.newMsgId,
-                    domain: this.getDomain(callInfo.entityId),
-                    return_response: false,
-                    service: callInfo.service,
-                    service_data: {
-                        entity_id: callInfo.entityId,
-                        ...callInfo.serviceData
-                    },
-                    type: 'call_service'
-                };
-                if (callInfo.unmergeable) {
-                    callDataMap.set(callData.id, callData);
+                // unmergeable 用唯一 key 不参与合并，与可合并项一同按插入顺序输出
+                const key = callInfo.unmergeable
+                    ? `__unmergeable_${unmergeableIndex++}`
+                    : callInfo.entityId + '##' + callInfo.service;
+                const existing = callInfoMap.get(key);
+                if (existing) {
+                    existing.serviceData = {
+                        ...(existing.serviceData ?? {}),
+                        ...(callInfo.serviceData ?? {})
+                    };
                 } else {
-                    const targetCallData = callDataMap.get(callInfo.entityId + '##' + callInfo.service);
-                    if (targetCallData) {
-                        targetCallData.service_data = { ...targetCallData.service_data, ...callInfo.serviceData };
-                    } else {
-                        callDataMap.set(callInfo.entityId + '##' + callInfo.service, callData);
-                    }
+                    callInfoMap.set(key, { ...callInfo });
                 }
             }
 
-            for (const [callDataKey, callData] of callDataMap) {
-                const { entity_id, ...rest } = callData.service_data;
-                const hasExtra = Object.keys(rest).length > 0;
-                logger.info(
-                    `[call] ${callData.domain}.${callData.service} ${entity_id}${hasExtra ? ' ' + JSON.stringify(rest) : ''}`
-                );
-                haWebsocketService.send(callData);
-            }
+            const emit = (callInfo: CallInfo): void => {
+                const domain = callInfo.entityId.split('.')[0];
+                const extra =
+                    callInfo.serviceData && Object.keys(callInfo.serviceData).length
+                        ? ' ' + JSON.stringify(callInfo.serviceData)
+                        : '';
+                logger.info(`[call] ${domain}.${callInfo.service} ${callInfo.entityId}${extra}`);
+                router.call(callInfo);
+            };
+
+            for (const callInfo of callInfoMap.values()) emit(callInfo);
 
             this.#callingIsActivated = false;
         } catch (error) {
             logger.printError(error);
         }
-    }
-
-    private getDomain(entityId: string): string {
-        if (!entityId) return undefined;
-
-        const index = entityId.indexOf('.');
-        if (index === -1) return undefined;
-
-        return entityId.slice(0, index);
     }
 
     static get instance(): CallService {

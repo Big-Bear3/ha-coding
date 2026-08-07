@@ -1,0 +1,56 @@
+---
+description: TypeScript 编码风格约定（适用本项目）
+globs: **/*.ts,**/*.tsx,**/*.vue
+alwaysApply: true
+---
+
+# TypeScript 编码风格
+
+## 不要写多余的 `| null | undefined`
+
+本仓库 `tsconfig.json` 中 `strictNullChecks` 为 `false`，所以 `null`/`undefined` 默认就能赋给任意类型。**不要**为类型加上多余的 `| null | undefined`。仅当 `null` 或 `undefined` 承载明确业务语义（例如"显式表示删除"、"未初始化"等）时，才在类型里写出来，并附简短注释说明语义。
+
+```ts
+// ❌ BAD：多余的可空联合
+let userNickname: string | undefined;
+function getName(): string | null { ... }
+interface Ctx { tier?: AgentModelTier | null }
+
+// ✅ GOOD
+let userNickname: string;
+function getName(): string { ... }
+interface Ctx { tier?: AgentModelTier }
+```
+
+也不要写多余的 `?? undefined` / `?? null` 兜底：
+
+```ts
+// ❌ BAD
+return user.nickname ?? undefined;
+
+// ✅ GOOD
+return user.nickname;
+```
+
+## 简洁优先：能用三目就别封装方法
+
+只在一两处使用、且逻辑只有一行判断的取值，不要单独封装成方法。
+
+```ts
+// ❌ BAD：仅一处使用，徒增间接层
+private getNickname(reqId: number): string {
+    return this.user.id === reqId ? this.user.nickname : undefined;
+}
+this.save(..., this.getNickname(requestId));
+
+// ✅ GOOD：内联三目
+const nickname = this.user.id === requestId ? this.user.nickname : undefined;
+this.save(..., nickname);
+```
+
+## 注释克制
+
+- 不写"narrate the code"型注释（解释下一行明显在做什么）。
+- 不在改动处写"本次改动说明"。
+- 仅当意图、权衡、边界条件代码本身无法表达时再加注释。
+

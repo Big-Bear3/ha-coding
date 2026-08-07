@@ -4,6 +4,7 @@ import type { HAEvent } from '../types/ha-types';
 import { GEOGRAPHIC_LOCATION, HA_WEBSOCKET_ADDRESS } from '../config/config.js';
 import { AppService } from './app-service.js';
 import { EventService } from './event-service.js';
+import { MiRouter } from './mi/mi-router.js';
 import { customSubscribers } from '../actions/custom-subscribe.js';
 import { StateManager } from '../managers/state-manager.js';
 import { logger } from './logger-service.js';
@@ -74,6 +75,10 @@ export class HAWebsocketService {
                                     if (isReconnect) StateManager.instance.pauseActionExec();
 
                                     for (const [entityId, event] of Object.entries<HAEvent>(msgData.event.a)) {
+                                        // 直连推送通道可用的 direct 实体不走 HA 事件，避免双源重复。
+                                        // 用 providesStateFor（看推送通道）而非 usesMiGateway（看控制通道）：
+                                        // MQTT 全断时放行 HA 事件兜底。
+                                        if (MiRouter.instance.providesStateFor(entityId)) continue;
                                         EventService.instance.handleEvent(entityId, event);
                                     }
 
@@ -91,7 +96,10 @@ export class HAWebsocketService {
 
                                 const event: HAEvent = msgData.event.c[entityId]['+'];
 
-                                EventService.instance.handleEvent(entityId, event);
+                                // 同上：按推送通道判断，非控制通道
+                                if (!MiRouter.instance.providesStateFor(entityId)) {
+                                    EventService.instance.handleEvent(entityId, event);
+                                }
 
                                 break;
 

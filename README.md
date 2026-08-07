@@ -49,6 +49,36 @@ export default {
 npm start
 ```
 等待几秒后控制台打印 “HA Coding 启动成功！”，则证明启动成功。如果控制台报错，则为启动失败。
+
+## 小米中枢网关直连（可选）
+
+ha-coding 支持直连小米中枢网关，**小米设备可不经过 Home Assistant 直接控制**（`@Device({ miGatewayDirect: true })`），也支持**完全不装 HA** 的纯小米直连模式。
+
+**直连模式特点：**
+- 小米设备的状态广播、命令下发直接走网关/云端，不依赖 HA。
+- HA 未启用时，所有设备默认走直连（`miGatewayDirect` 默认 true，`@Device()` 即可）。
+- 非小米设备仍需 HA 桥接。
+
+**一次性设置（miLogin）：** 执行框架的 miLogin 流程（浏览器 OAuth 授权 + 云端签证书），凭证存入 `.localstorage/`，之后自动刷新。OAuth 回调地址硬编码 `homeassistant.local:8123`（小米只认这个），用手工复制授权码，**不需要真有 HA**。
+
+**发现设备 + 生成 entity_id：** 小米设备的 entity_id 遵循 ha_xiaomi_home 格式，手拼易错。用发现工具自动生成：
+```bash
+# 在已 miLogin 的项目根目录运行
+node ha-coding/scripts/discover-devices.mjs [过滤词]
+# -> ./mi-devices-discovered.md（每设备的 entity_id 清单 + @Device 模板）
+```
+
+**纯小米直连（无 HA）：** config.js 的 HA 字段留空即可，框架自动跳过 HA：
+```ts
+export default {
+    IP_ADDRESS_PORT: '',  // 留空 -> 纯小米直连模式
+    HA_USER_NAME: '',
+    HA_PASSWORD: ''
+};
+```
+
+详细指南见 [skills/xiaomi-direct/SKILL.md](skills/xiaomi-direct/SKILL.md)，本地 RPC 限制见 [MI_GATEWAY_LOCAL_RPC.md](MI_GATEWAY_LOCAL_RPC.md)。
+
 # 使用说明
 ## 定义设备
 <br>定义设备是为了告知系统每个设备是如何与 Home Assistant 交互的，推荐在项目的 devices-def 文件夹下定义
@@ -362,9 +392,10 @@ onDetect() 方法用于记录一段时间内的状态，供用户判断，并执
 
 ## @Device()
 ```ts
-function Device(): ClassDecorator;
+function Device(options?: { miGatewayDirect?: boolean }): ClassDecorator;
 ```
 @Device() 装饰器用于装饰设备定义类，设备定义类被其装饰才会有本篇说明的一系列效果。
+- options.miGatewayDirect - 是否直连小米中枢网关（不走 HA）。HA 未启用时默认 true。
 
 ## @State()
 ```ts

@@ -8,6 +8,9 @@ const config = configModule.default;
 
 export const IP_ADDRESS_PORT: string = config.IP_ADDRESS_PORT;
 
+/** 是否启用 HA（未配置 IP_ADDRESS_PORT 则跳过，纯小米直连模式） */
+export const HA_ENABLED: boolean = !!config.IP_ADDRESS_PORT;
+
 export const HA_USER_NAME: string = config.HA_USER_NAME;
 
 export const HA_PASSWORD: string = config.HA_PASSWORD;
@@ -15,6 +18,9 @@ export const HA_PASSWORD: string = config.HA_PASSWORD;
 export const IMMEDIATE_CALL: boolean = config.IMMEDIATE_CALL ?? false;
 
 export const HA_WEBSOCKET_ADDRESS = `ws://${IP_ADDRESS_PORT}/api/websocket`;
+
+/** OAuth 回调地址（小米仅接受注册值 homeassistant.local:8123，不可更改） */
+export const MI_OAUTH_REDIRECT_URL = 'http://homeassistant.local:8123';
 
 export const HOLIDAYS = [
     '2026-01-01', // 元旦
@@ -60,5 +66,5 @@ export const HOLIDAYS = [
 
 export const EXTRA_WORK_DAYS = ['2026-01-04', '2026-02-14', '2026-02-28', '2026-05-09', '2026-09-20', '2026-10-10'];
 
-/** 地理位置 [纬度, 经度, 海拔] */
-export const GEOGRAPHIC_LOCATION = [39.54, 116.25, 43];
+/** 地理位置 [纬度, 经度, 海拔]（在 config.js 配置；无 HA 时不会自动回填，默认北京） */
+export const GEOGRAPHIC_LOCATION: [number, number, number] = config.GEOGRAPHIC_LOCATION ?? [39.54, 116.25, 43];

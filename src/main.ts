@@ -1,3 +1,6 @@
+// @peculiar/x509 依赖 tsyringe，运行时需要 reflect-metadata polyfill
+import 'reflect-metadata';
+
 import { Device } from './decorators/device.js';
 import { State } from './decorators/state.js';
 import { Action } from './decorators/action.js';
@@ -33,6 +36,8 @@ import type { ObjectType } from './types/types';
 import { GEOGRAPHIC_LOCATION } from './config/config.js';
 import { DeviceManager } from './managers/device-manager.js';
 import { logger } from './services/logger-service.js';
+import { MiCertManager } from './services/mi/mi-cert-manager.js';
+import { MI_OAUTH_REDIRECT_URL } from './config/config.js';
 
 const call = (callInfo: CallInfo) => CallService.instance.push(callInfo);
 
@@ -45,6 +50,9 @@ const isUnavailableEntity = (entityId: string) => DeviceManager.instance.isUnava
 const getUnavailableEntities = () => DeviceManager.instance.getUnavailableEntities();
 
 const getBelongingDevice = (entityId: string) => DeviceManager.instance.getDevice(entityId);
+
+/** 小米中枢网关 OAuth 登录（首次使用直连前调用一次） */
+const miLogin = (): Promise<void> => MiCertManager.instance.login(MI_OAUTH_REDIRECT_URL);
 
 export {
     Device,
@@ -83,5 +91,7 @@ export {
     isUnavailableEntity,
     getUnavailableEntities,
     getBelongingDevice,
-    logger
+    logger,
+    miLogin
 };
+
