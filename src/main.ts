@@ -38,6 +38,8 @@ const call = (callInfo: CallInfo) => CallService.instance.push(callInfo);
 
 const sendMessage = (msg: string | ObjectType) => HAWebsocketService.instance.send(msg);
 
+const getHaWsHealth = () => HAWebsocketService.getHaWsHealth();
+
 const getGeographicLocation = () => GEOGRAPHIC_LOCATION;
 
 const isUnavailableEntity = (entityId: string) => DeviceManager.instance.isUnavailableEntity(entityId);
@@ -79,6 +81,7 @@ export {
     customSubscribe,
     removeCustomSubscribe,
     sendMessage,
+    getHaWsHealth,
     getGeographicLocation,
     isUnavailableEntity,
     getUnavailableEntities,

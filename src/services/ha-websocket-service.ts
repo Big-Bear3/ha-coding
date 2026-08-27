@@ -29,6 +29,8 @@ export class HAWebsocketService {
 
     #pingTimeout: NodeJS.Timeout;
 
+    #lastMessageAt = 0;
+
     get newMsgId() {
         return ++this.#currentMsgId;
     }
@@ -48,6 +50,7 @@ export class HAWebsocketService {
 
                 this.#ws.onmessage = async (msg: WebSocket.MessageEvent) => {
                     try {
+                        this.#lastMessageAt = Date.now();
                         this.resetReceiveMsgTimeout();
 
                         const msgData = JSON.parse(msg.data as string);
@@ -239,5 +242,14 @@ export class HAWebsocketService {
     static get instance(): HAWebsocketService {
         if (!HAWebsocketService.#instance) HAWebsocketService.#instance = new HAWebsocketService();
         return HAWebsocketService.#instance;
+    }
+
+    /**
+     * HA ws 健康状态，供外部健康检查使用。
+     * ready：订阅是否就绪；lastMessageAt：最近一条消息时间戳（ms，含 ping/pong，健康时 29s 内必有更新；0=从未收到）。
+     */
+    static getHaWsHealth(): { ready: boolean; lastMessageAt: number } {
+        const inst = HAWebsocketService.instance;
+        return { ready: inst.#haWebsocketReady, lastMessageAt: inst.#lastMessageAt };
     }
 }

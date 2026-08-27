@@ -52,6 +52,7 @@ npm start
 ```
 等待几秒后控制台打印 “HA Coding 启动成功！”，则证明启动成功。如果控制台报错，则为启动失败。
 如果启动时 HomeAssistant 尚未就绪（例如服务器开机时所有容器同时启动），会打印失败原因并自动每隔 `HA_WS_CONNECT_TIMEOUT` 毫秒重试，直到连接成功。
+连接成功后可通过 `getHaWsHealth()` 获取 HA websocket 的健康状态（`ready`：订阅是否就绪；`lastMessageAt`：最近一条消息时间戳，健康时 29 秒内必有更新），可用于对外暴露健康检查端点。
 # 使用说明
 ## 定义设备
 <br>定义设备是为了告知系统每个设备是如何与 Home Assistant 交互的，推荐在项目的 devices-def 文件夹下定义

@@ -239,6 +239,9 @@ export function removeCustomSubscribe(customSubscribeId: number): void;
 
 export function sendMessage(msg: string | ObjectType): void;
 
+/** HA ws 健康状态：ready=订阅就绪；lastMessageAt=最近一条消息时间戳(ms，含 ping/pong，健康时 29s 内必有更新；0=从未收到) */
+export function getHaWsHealth(): { ready: boolean; lastMessageAt: number };
+
 export function getGeographicLocation(): [number, number, number];
 
 export function isUnavailableEntity(entityId: string): boolean;
