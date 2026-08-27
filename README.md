@@ -40,7 +40,9 @@ export default {
     /** HomeAssistant用户名 */
     HA_USER_NAME: '',
     /** HomeAssistant密码 */
-    HA_PASSWORD: ''
+    HA_PASSWORD: '',
+    /** 可选：ws 连接/重连的单次等待超时（毫秒），默认 30000 */
+    HA_WS_CONNECT_TIMEOUT: 30000
 };
 ```
 **启动项目：**
@@ -49,6 +51,7 @@ export default {
 npm start
 ```
 等待几秒后控制台打印 “HA Coding 启动成功！”，则证明启动成功。如果控制台报错，则为启动失败。
+如果启动时 HomeAssistant 尚未就绪（例如服务器开机时所有容器同时启动），会打印失败原因并自动每隔 `HA_WS_CONNECT_TIMEOUT` 毫秒重试，直到连接成功。
 # 使用说明
 ## 定义设备
 <br>定义设备是为了告知系统每个设备是如何与 Home Assistant 交互的，推荐在项目的 devices-def 文件夹下定义

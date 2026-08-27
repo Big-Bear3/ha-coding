@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import type { ObjectType } from '../types/types';
 import type { HAEvent } from '../types/ha-types';
-import { GEOGRAPHIC_LOCATION, HA_WEBSOCKET_ADDRESS } from '../config/config.js';
+import { GEOGRAPHIC_LOCATION, HA_WEBSOCKET_ADDRESS, HA_WS_CONNECT_TIMEOUT } from '../config/config.js';
 import { AppService } from './app-service.js';
 import { EventService } from './event-service.js';
 import { customSubscribers } from '../actions/custom-subscribe.js';
@@ -207,11 +207,28 @@ export class HAWebsocketService {
         }
 
         try {
-            await this.createHAWebsocket(true);
+            // 高负载下 createHAWebsocket 可能既不 onopen 也不 onerror（假死挂起），
+            // 超时强制走失败分支，避免 await 永久阻塞且无任何重试 timer 兜底。
+            await Promise.race([
+                this.createHAWebsocket(true),
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error(`重连 ${HA_WS_CONNECT_TIMEOUT / 1000} 秒超时`)), HA_WS_CONNECT_TIMEOUT)
+                )
+            ]);
             logger.print('重连成功！');
         } catch (error) {
             logger.printError('重连失败，将在60秒后重试！');
             logger.printError(error);
+
+            // 超时竞态下 #ws 可能已被 createHAWebsocket 换成挂起的孤儿连接，close 掉防止泄漏
+            if (this.#ws && this.#ws.readyState !== WebSocket.CLOSED) {
+                this.#ws.onclose = null;
+                try {
+                    this.#ws.close();
+                } catch {
+                    /* 忽略关闭异常 */
+                }
+            }
 
             setTimeout(() => {
                 this.reconnect();

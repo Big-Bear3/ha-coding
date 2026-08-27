@@ -14,6 +14,8 @@ export const HA_PASSWORD: string = config.HA_PASSWORD;
 
 export const IMMEDIATE_CALL: boolean = config.IMMEDIATE_CALL ?? false;
 
+export const HA_WS_CONNECT_TIMEOUT: number = config.HA_WS_CONNECT_TIMEOUT ?? 30000;
+
 export const HA_WEBSOCKET_ADDRESS = `ws://${IP_ADDRESS_PORT}/api/websocket`;
 
 export const HOLIDAYS = [

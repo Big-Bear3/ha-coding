@@ -1,5 +1,6 @@
 import { startupCbs } from '../actions/life-cycle.js';
 import { getLoginInfo, getToken, login } from '../api/api-ha.js';
+import { HA_WS_CONNECT_TIMEOUT } from '../config/config.js';
 import { HAWebsocketService } from './ha-websocket-service.js';
 import { logger } from './logger-service.js';
 
@@ -32,21 +33,30 @@ export class AppService {
 }
 
 export async function initHACoding(): Promise<void> {
-    try {
-        await import('../config/config.js');
+    let attempt = 0;
 
-        await HAWebsocketService.instance.createHAWebsocket();
+    while (true) {
+        try {
+            await import('../config/config.js');
 
-        logger.print('HA Coding 启动成功！');
+            await HAWebsocketService.instance.createHAWebsocket();
 
-        for (const startupCb of startupCbs) {
-            try {
-                startupCb();
-            } catch (error) {
-                logger.printError(error);
+            logger.print(attempt === 0 ? 'HA Coding 启动成功！' : `HA Coding 启动成功！(重试 ${attempt} 次后)`);
+
+            for (const startupCb of startupCbs) {
+                try {
+                    startupCb();
+                } catch (error) {
+                    logger.printError(error);
+                }
             }
+
+            return;
+        } catch (error) {
+            attempt++;
+            logger.printError(`HA Coding 初始化失败(HA 可能未就绪)，${HA_WS_CONNECT_TIMEOUT / 1000} 秒后重试(${attempt}):`);
+            logger.printError(error);
+            await new Promise((resolve) => setTimeout(resolve, HA_WS_CONNECT_TIMEOUT));
         }
-    } catch (error) {
-        logger.printError(error);
     }
 }
